@@ -4,7 +4,7 @@
  * (reference/ans_pages/). House style: docs/03-authoring-style.md.
  */
 
-import { m, t, h, note } from "../../engine/authoring.js";
+import { m, t, h, note, lk } from "../../engine/authoring.js";
 
 export const SOLUTIONS = [
   // ---------------------------------------------------------------- q1
@@ -28,10 +28,11 @@ export const SOLUTIONS = [
   {
     id: "q2",
     letter: "C",
+    links: [{ key: "h", color: "blue", note: "the building is 50 m tall", q: ["50 m tall"] }],
     boxes: [{
       steps: [
         t("Consider vertical motion,"),
-        m("50 = \\frac{1}{2}gt^2 \\Rightarrow t = \\sqrt{\\frac{100}{g}}\\ \\text{s}"),
+        lk("h", m("50 = \\frac{1}{2}gt^2 \\Rightarrow t = \\sqrt{\\frac{100}{g}}\\ \\text{s}")),
         t("Consider horizontal motion,"),
         m("d = vt = 10\\times\\sqrt{\\frac{100}{g}}"),
         m("\\therefore d = \\underline{31.9\\ \\text{m}}"),
@@ -63,15 +64,19 @@ export const SOLUTIONS = [
   {
     id: "q4",
     letter: "B",
+    links: [
+      { key: "x0", color: "blue", note: "hits the wall 1.0 m away", q: ["At what speed is it projected"] },
+      { key: "y0", color: "pink", note: "0.8 m below the projection", q: ["vertically below its point of projection"] },
+    ],
     boxes: [{
       steps: [
         t("Vertical component:"),
         m("y = \\frac{1}{2}gt^2"),
-        m("\\therefore (0.8) = \\frac{1}{2}(9.81)t^2"),
+        lk("y0", m("\\therefore (0.8) = \\frac{1}{2}(9.81)t^2")),
         m("\\therefore t = 0.404\\ \\text{s}"),
         t("Horizontal component:"),
         m("x = ut"),
-        m("\\therefore (1.0) = u(0.404)"),
+        lk("x0", m("\\therefore (1.0) = u(0.404)")),
         m("\\therefore u = \\underline{2.5\\ \\text{m s}^{-1}}"),
         m("\\therefore \\text{The answer is B.}"),
       ],
@@ -81,10 +86,11 @@ export const SOLUTIONS = [
   // ---------------------------------------------------------------- q5
   {
     id: "q5",
+    links: [{ key: "drop", color: "amber", note: "1 m below the nozzle", q: ["1 m below the nozzle"] }],
     boxes: [{
       steps: [
         m("s = ut + \\frac{1}{2}at^2"),
-        m("s_y = \\frac{1}{2}(9.81)(t^2) = 1"),
+        lk("drop", m("s_y = \\frac{1}{2}(9.81)(t^2) = 1")),
         m("t = 0.45\\ \\text{s}"),
         t("Velocity (magnitude and direction) of the water when it enters the pond:"),
         m("v = u + at \\Rightarrow v_y = 0 + (9.81)(0.45) = 4.41\\ \\text{m s}^{-1}"),
@@ -137,11 +143,12 @@ export const SOLUTIONS = [
   // ---------------------------------------------------------------- q8
   {
     id: "q8",
+    links: [{ key: "t08", color: "blue", note: "$t = 0.8$ s", q: ["0.8 s after"] }],
     boxes: [{
       steps: [
         m("u_x = 20\\cos 45^\\circ = 14.14\\ \\text{m s}^{-1}"),
         m("u_y = 20\\sin 45^\\circ = 14.14\\ \\text{m s}^{-1}"),
-        m("t = 0.8\\ \\text{s}"),
+        lk("t08", m("t = 0.8\\ \\text{s}")),
         t("Horizontal displacement:"),
         m("s_x = u_x t = 14.14(0.8)"),
         m("= \\underline{11.3\\ \\text{m}}"),
@@ -173,6 +180,7 @@ export const SOLUTIONS = [
   // ---------------------------------------------------------------- q10
   {
     id: "q10",
+    links: [{ key: "target", color: "amber", note: "the throw must reach 18 m", q: ["18 m away from him"] }],
     boxes: [{
       steps: [
         h("(a)"),
@@ -185,7 +193,7 @@ export const SOLUTIONS = [
         t("In the horizontal direction,"),
         m("s_x = u_x t"),
         m("= 13\\cos 30^\\circ \\times 1.53"),
-        m("= 17.2\\ \\text{m} < 18\\ \\text{m}"),
+        lk("target", m("= 17.2\\ \\text{m} < 18\\ \\text{m}")),
         m("\\therefore \\text{Charles will not win with this throw.}"),
       ],
     }],
@@ -194,11 +202,12 @@ export const SOLUTIONS = [
   // ---------------------------------------------------------------- q11
   {
     id: "q11",
+    links: [{ key: "hoop", color: "blue", note: "the hoop is 3.05 m high", q: ["3.05 m high"] }],
     boxes: [{
       steps: [
         h("(a)"),
         m("\\text{By } s_y = u_y t - \\frac{1}{2}gt^2,"),
-        m("3.05 - 1.9 = 6\\cos 20^\\circ t - \\frac{1}{2}(9.81)t^2"),
+        lk("hoop", m("3.05 - 1.9 = 6\\cos 20^\\circ t - \\frac{1}{2}(9.81)t^2")),
         m("1.15 = 5.638t - 4.905t^2"),
         m("4.905t^2 - 5.638t + 1.15 = 0"),
         m("t = 0.884\\ \\text{s or } 0.265\\ \\text{s (rejected)}"),
@@ -215,6 +224,7 @@ export const SOLUTIONS = [
   // ---------------------------------------------------------------- q12
   {
     id: "q12",
+    links: [{ key: "h14", color: "pink", note: "released 1.4 m above the ground", q: ["height of 1.4 m"] }],
     boxes: [{
       steps: [
         t("Let $v$ be the projecting velocity of the ball and $t$ be the time of flight."),
@@ -223,7 +233,7 @@ export const SOLUTIONS = [
         m("vt\\cos 30^\\circ = 18"),
         m("v = \\frac{18}{t\\cos 30^\\circ} \\quad \\cdots (1)"),
         t("Consider the vertical displacement,"),
-        m("-1.4 = vt\\sin 30^\\circ - \\frac{1}{2}(9.81)t^2 \\quad \\cdots (2)"),
+        lk("h14", m("-1.4 = vt\\sin 30^\\circ - \\frac{1}{2}(9.81)t^2 \\quad \\cdots (2)")),
         t("Substitute (1) into (2),"),
         m("-1.4 = \\left(\\frac{18}{t\\cos 30^\\circ}\\right)t\\sin 30^\\circ - \\frac{1}{2}(9.81)t^2"),
         m("-1.4 = 18\\tan 30^\\circ - 4.905t^2"),
@@ -242,6 +252,7 @@ export const SOLUTIONS = [
   // ---------------------------------------------------------------- q13
   {
     id: "q13",
+    links: [{ key: "d210", color: "blue", note: "lands 21.0 m away", q: ["21.0 m away"] }],
     boxes: [{
       steps: [
         t("Take the downward direction as positive."),
@@ -253,7 +264,7 @@ export const SOLUTIONS = [
         h("(b)"),
         t("In the horizontal direction:"),
         m("v = \\frac{s_x}{t}"),
-        m("= \\frac{21.0}{0.714}"),
+        lk("d210", m("= \\frac{21.0}{0.714}")),
         m("= \\underline{29.4\\ \\text{m s}^{-1}}"),
         h("(c)"),
         t("In the vertical direction:"),
@@ -293,10 +304,11 @@ export const SOLUTIONS = [
   {
     id: "q15",
     letter: "B",
+    links: [{ key: "r5", color: "amber", note: "the range is 5 m", q: ["5 m away from the pool side"] }],
     boxes: [{
       steps: [
         m("\\text{Range} = \\frac{u^2\\sin 2\\theta}{g}"),
-        m("5 = \\frac{v^2\\sin 2(30^\\circ)}{9.81}"),
+        lk("r5", m("5 = \\frac{v^2\\sin 2(30^\\circ)}{9.81}")),
         m("v = \\sqrt{\\frac{5\\times 9.81}{\\sin 60^\\circ}}"),
         m("v = \\underline{7.53\\ \\text{m s}^{-1}}"),
         m("\\therefore \\text{The answer is B.}"),
@@ -308,10 +320,11 @@ export const SOLUTIONS = [
   {
     id: "q16",
     letter: "B",
+    links: [{ key: "a42", color: "blue", note: "angle to the horizontal", q: ["angle 42o"] }],
     boxes: [{
       steps: [
         t("Take upward as positive, then,"),
-        m("u_y = 40\\sin 42^\\circ\\ \\text{m s}^{-1}"),
+        lk("a42", m("u_y = 40\\sin 42^\\circ\\ \\text{m s}^{-1}")),
         m("v_y = -40\\sin 42^\\circ\\ \\text{m s}^{-1}"),
         m("a = -9.81\\ \\text{m s}^{-2}"),
         m("v_y = u_y + at"),
@@ -371,11 +384,12 @@ export const SOLUTIONS = [
   // ---------------------------------------------------------------- q19
   {
     id: "q19",
+    links: [{ key: "u15", color: "blue", note: "$u_x = 15$ m s$^{-1}$", q: ["15 ms-1"] }],
     boxes: [{
       steps: [
         t("Take the downward direction as positive."),
         h("(a)"),
-        t("Horizontal motion: $u_x = 15$ m s$^{-1}$ (constant)"),
+        lk("u15", t("Horizontal motion: $u_x = 15$ m s$^{-1}$ (constant)")),
         t("Vertical motion: $u_y = 0$ m s$^{-1}$, $a_y = 9.81$ m s$^{-2}$"),
         m("\\text{Apply } v_y = u_y + a_y t,"),
         m("v_y = 0 + (9.81)(1)"),
@@ -408,6 +422,7 @@ export const SOLUTIONS = [
   // ---------------------------------------------------------------- q20
   {
     id: "q20",
+    links: [{ key: "h100", color: "pink", note: "the tower is 100 m high", q: ["height 100 m"] }],
     boxes: [{
       steps: [
         t("Take the downward direction as positive."),
@@ -416,7 +431,7 @@ export const SOLUTIONS = [
         m("s_x = u_x t"),
         m("120 = (u\\cos 30^\\circ)t"),
         m("u = \\frac{120}{t\\cos 30^\\circ} \\quad \\cdots (1)"),
-        t("Vertical motion: $u_y = -u\\sin 30^\\circ$, $a_y = 9.81$ m s$^{-2}$, $s_y = 100$ m"),
+        lk("h100", t("Vertical motion: $u_y = -u\\sin 30^\\circ$, $a_y = 9.81$ m s$^{-2}$, $s_y = 100$ m")),
         m("s_y = u_y t + \\frac{1}{2}at^2"),
         m("100 = (-u\\sin 30^\\circ)t + \\frac{1}{2}(9.81)t^2 \\quad \\cdots (2)"),
         t("Substitute (1) into (2),"),
