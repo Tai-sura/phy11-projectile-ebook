@@ -122,12 +122,13 @@ function q14(root) {
 /* ---------- Q6: dropping and projecting, side by side ---------- */
 
 function q6(root) {
-  const W = 660, HT = 360, G = 9.81, HM = 5;           // 5 m drop, same for both
+  const W = 660, HT = 250, G = 9.81, HM = 5;           // 5 m drop, same for both
   const TF = Math.sqrt((2 * HM) / G);                  // time to fall 5 m
   const TMAX = Math.ceil(TF * 100) / 100;              // a slider max the step can reach
   const SC = 30;                                       // px per metre, both axes
-  const GROUND = 320, Y0 = GROUND - HM * SC;           // release height in px
+  const GROUND = 224, Y0 = GROUND - HM * SC;           // release height in px
   const XP = 150, XQ = 200;                            // XQ leaves room for u = 12 m s⁻¹
+  const STEP = 0.2;                                    // one footprint every 0.2 s
 
   const svg = scene(W, HT);
   const su = slider({ label: "Q's horizontal speed u (m s⁻¹)", min: 1, max: 12, step: 1, value: 8 });
@@ -160,48 +161,63 @@ function q6(root) {
     ]),
   );
 
+  // Every height on the panel — both balls, the footprints, the green line and the +Δy
+  // labels — comes from this one function, so they can never disagree with each other.
+  const fall = (time) => {
+    const tt = Math.min(time, TF);
+    return 0.5 * G * tt * tt;
+  };
+
   const draw = () => {
     const u = su.get(), t = st.get();
     const tt = Math.min(t, TF);                // the slider may sit a hundredth past the ground
-    const y = 0.5 * G * tt * tt;               // fall in metres, the same for P and Q
+    const y = fall(tt);                        // fall in metres, the same for P and Q
     const vy = G * tt;
-    const xq = XQ + u * t * SC;
     const pP = { x: XP, y: Y0 + y * SC };
-    const pQ = { x: Math.min(xq, W - 90), y: Y0 + y * SC };
+    const pQ = { x: XQ + u * tt * SC, y: Y0 + y * SC };
 
     clear(svg);
-    // ground and release height
+    T(svg, 64, 14, "每 0.2 s 一個腳印：紅＝P 自由落、藍＝Q 水平拋出", { fill: C.ink, "font-size": 12 });
+    T(svg, 64, 32, "綠虛線＝同一時刻同高　+Δy＝該段垂直落距　h = 5 m", { fill: C.grey, "font-size": 12 });
+
+    // the floor and the height they are released from
     S("line", { x1: 60, y1: GROUND, x2: W - 20, y2: GROUND, stroke: C.line, "stroke-width": 3 }, svg);
     S("line", { x1: 60, y1: Y0, x2: W - 20, y2: Y0, stroke: C.soft, "stroke-width": 1, "stroke-dasharray": "5 5" }, svg);
-    T(svg, W - 150, Y0 - 8, `same height: ${HM} m`, { fill: C.grey, "font-size": 12 });
-    T(svg, 64, GROUND + 18, "ground", { fill: C.grey, "font-size": 12 });
+    T(svg, 64, GROUND + 16, "ground", { fill: C.grey, "font-size": 12 });
 
-    // the height each ball has fallen, drawn under both
-    for (const p of [pP, pQ]) {
-      S("line", { x1: p.x, y1: p.y, x2: p.x, y2: GROUND, stroke: C.soft, "stroke-width": 1, "stroke-dasharray": "3 4" }, svg);
+    // the stroboscope: one pair of footprints for every 0.2 s the time has gone past.
+    // The pair shares one y, and the +Δy on P's column is the step between two of them.
+    let prev = 0;
+    for (let k = 1; k * STEP <= tt + 1e-9; k++) {
+      const tk = k * STEP;
+      const yk = fall(tk);
+      const qx = XQ + u * tk * SC;
+      const py = Y0 + yk * SC;
+      S("line", { x1: XP, y1: py, x2: qx, y2: py, stroke: "#e59292", "stroke-width": 1, "stroke-dasharray": "3 4" }, svg);
+      S("circle", { cx: XP, cy: py, r: 5, fill: "#fff", stroke: C.red, "stroke-width": 1.6 }, svg);
+      S("circle", { cx: qx, cy: py, r: 5, fill: "#fff", stroke: C.blue, "stroke-width": 1.6 }, svg);
+      // the equal sideways steps, marked where they started on the release line
+      S("line", { x1: qx, y1: Y0 - 6, x2: qx, y2: Y0 - 2, stroke: C.blue, "stroke-width": 1.6 }, svg);
+      T(svg, XP - 12, Y0 + ((prev + yk) / 2) * SC + 3, `+${(yk - prev).toFixed(2)}`, {
+        fill: C.red, "font-size": 11, "text-anchor": "end",
+      });
+      prev = yk;
     }
-    // the line joining them: always level, so they hit the ground together
-    S("line", { x1: pP.x, y1: pP.y, x2: pQ.x, y2: pQ.y, stroke: C.green, "stroke-width": 2, "stroke-dasharray": "6 4" }, svg);
-    T(svg, 70, Y0 - 26, "same height at every instant", {
-      fill: C.green, "font-size": 12, "font-weight": 700,
-    });
 
-    // the balls
-    S("circle", { cx: pP.x, cy: pP.y, r: 9, fill: C.amberSoft, stroke: C.amber, "stroke-width": 2 }, svg);
+    // the live pair: the green line is level by construction, it reads pP.y
+    S("line", { x1: pP.x, y1: pP.y, x2: pQ.x, y2: pP.y, stroke: C.green, "stroke-width": 2, "stroke-dasharray": "6 4" }, svg);
+    S("circle", { cx: pP.x, cy: pP.y, r: 9, fill: C.redSoft, stroke: C.red, "stroke-width": 2 }, svg);
     T(svg, pP.x, pP.y + 4, "P", { fill: C.ink, "font-size": 12, "font-weight": 700, "text-anchor": "middle" });
     S("circle", { cx: pQ.x, cy: pQ.y, r: 9, fill: C.blueSoft, stroke: C.blue, "stroke-width": 2 }, svg);
     T(svg, pQ.x, pQ.y + 4, "Q", { fill: C.ink, "font-size": 12, "font-weight": 700, "text-anchor": "middle" });
+
     if (u > 0) {
       const x1 = pQ.x + 12, x2 = Math.min(x1 + Math.min(u * 5, 70), W - 8);
       S("line", { x1, y1: pQ.y, x2, y2: pQ.y, stroke: C.blue, "stroke-width": 2 }, svg);
       S("polygon", { points: `${x2},${pQ.y} ${x2 - 8},${pQ.y - 4} ${x2 - 8},${pQ.y + 4}`, fill: C.blue }, svg);
-      T(svg, x1, pQ.y - 10, `u = ${u} m s⁻¹`, { fill: C.blue, "font-size": 12 });
+      // at a crawl the two footprints are 6 px apart, so the label climbs clear of them
+      T(svg, pQ.x + 14, pQ.y - 12 - (u <= 2 ? 8 : 0), `u = ${u} m s⁻¹`, { fill: C.blue, "font-size": 12 });
     }
-    // the fall so far, just under P and never on the floor: at landing the fall line
-    // has no length left, and beside the ball it used to sit on the "ground" label
-    T(svg, pP.x - 6, Math.min(pP.y + 22, GROUND - 14), `y = ${fmt(y, 2)} m`, {
-      fill: C.ink, "font-size": 12, "text-anchor": "end",
-    });
 
     const landed = t >= TF - 0.001;
     r.set(
