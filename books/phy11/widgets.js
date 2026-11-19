@@ -31,14 +31,15 @@ function q14(root) {
   );
 
   // plot frame, redrawn on every change
-  const X0 = 66, Y0 = 252, PW = 522, PH = 186;
+  const X0 = 66, Y0 = 252, PW = 500, PH = 186;
 
   const nice = (v) => {
     if (!(v > 0)) return 1;
     const s = niceStep(v, 6);
     return Math.ceil(v / s - 1e-9) * s;
   };
-  const num = (v) => (Math.abs(v - Math.round(v)) < 1e-9 ? String(Math.round(v)) : v.toFixed(0));
+  // keep as many decimals as the tick step needs, else a 0.5 m step prints "1, 1, 2"
+  const tick = (v, step) => v.toFixed(String(step).split(".")[1]?.length || 0);
 
   const draw = () => {
     const u = su.get(), deg = sa.get();
@@ -60,18 +61,19 @@ function q14(root) {
     const ys = niceStep(YMAX, 5);
     for (let x = xs; x <= XMAX + 1e-9; x += xs) {
       S("line", { x1: px(x), y1: py(0), x2: px(x), y2: py(YMAX), stroke: C.soft, "stroke-width": 1 }, svg);
-      T(svg, px(x), Y0 + 17, num(x), { fill: C.grey, "font-size": 12, "text-anchor": "middle" });
+      T(svg, px(x), Y0 + 17, tick(x, xs), { fill: C.grey, "font-size": 12, "text-anchor": "middle" });
     }
     for (let y = ys; y <= YMAX + 1e-9; y += ys) {
       S("line", { x1: px(0), y1: py(y), x2: px(XMAX), y2: py(y), stroke: C.soft, "stroke-width": 1 }, svg);
-      T(svg, X0 - 8, py(y) + 4, num(y), { fill: C.grey, "font-size": 12, "text-anchor": "end" });
+      T(svg, X0 - 8, py(y) + 4, tick(y, ys), { fill: C.grey, "font-size": 12, "text-anchor": "end" });
     }
 
     // axes
     S("line", { x1: px(0), y1: py(0), x2: px(XMAX) + 14, y2: py(0), stroke: C.line, "stroke-width": 2 }, svg);
     S("line", { x1: px(0), y1: py(0), x2: px(0), y2: py(YMAX) - 10, stroke: C.line, "stroke-width": 2 }, svg);
-    T(svg, px(XMAX) + 14, Y0 + 17, "x / m", { fill: C.line, "font-size": 12, "text-anchor": "end" });
-    T(svg, X0 - 8, py(YMAX) - 6, "y / m", { fill: C.line, "font-size": 12, "text-anchor": "end" });
+    // axis names off the ends of the axes, clear of the last tick labels
+    T(svg, px(XMAX) + 16, Y0 + 4, "x / m", { fill: C.line, "font-size": 12 });
+    T(svg, X0 + 4, py(YMAX) - 12, "y / m", { fill: C.line, "font-size": 12 });
 
     // the trajectory
     const pts = [];
@@ -87,10 +89,18 @@ function q14(root) {
     S("circle", { cx: px(xa), cy: py(Hm), r: 4, fill: C.amber }, svg);
     T(svg, px(xa) + 7, py(Hm) - 7, `H = ${fmt(Hm, 2)} m`, { fill: C.amber, "font-size": 12, "font-weight": 700 });
 
-    // launch point and landing point
+    // launch point and landing point; R is drawn as a measured span under the axis,
+    // which keeps it off the tick labels
     S("circle", { cx: px(0), cy: py(0), r: 5, fill: C.ink }, svg);
     S("circle", { cx: px(R), cy: py(0), r: 5, fill: C.red }, svg);
-    T(svg, px(R), Y0 + 36, `R = ${fmt(R, 1)} m`, { fill: C.red, "font-size": 14, "font-weight": 700, "text-anchor": "middle" });
+    const yd = Y0 + 44;
+    S("line", { x1: px(0), y1: yd, x2: px(R), y2: yd, stroke: C.red, "stroke-width": 1.5 }, svg);
+    for (const xx of [px(0), px(R)]) {
+      S("line", { x1: xx, y1: yd - 5, x2: xx, y2: yd + 5, stroke: C.red, "stroke-width": 1.5 }, svg);
+    }
+    T(svg, (px(0) + px(R)) / 2, yd - 7, `R = ${fmt(R, 1)} m`, {
+      fill: C.red, "font-size": 13, "font-weight": 700, "text-anchor": "middle",
+    });
 
     // the shot, printed above the frame so it never sits on the curve
     T(svg, X0, 34, `u = ${u} m s⁻¹ at θ = ${deg}°`, { fill: C.ink, "font-size": 13, "font-weight": 700 });
@@ -117,7 +127,7 @@ function q6(root) {
   const TMAX = Math.ceil(TF * 100) / 100;              // a slider max the step can reach
   const SC = 30;                                       // px per metre, both axes
   const GROUND = 320, Y0 = GROUND - HM * SC;           // release height in px
-  const XP = 150, XQ = 240;
+  const XP = 150, XQ = 200;                            // XQ leaves room for u = 12 m s⁻¹
 
   const svg = scene(W, HT);
   const su = slider({ label: "Q's horizontal speed u (m s⁻¹)", min: 1, max: 12, step: 1, value: 8 });
@@ -187,8 +197,9 @@ function q6(root) {
       S("polygon", { points: `${x2},${pQ.y} ${x2 - 8},${pQ.y - 4} ${x2 - 8},${pQ.y + 4}`, fill: C.blue }, svg);
       T(svg, x1, pQ.y - 10, `u = ${u} m s⁻¹`, { fill: C.blue, "font-size": 12 });
     }
-    // fall height readout beside P (it used to sit on the "same height" line at t = 0)
-    T(svg, pP.x - 14, pP.y + 4, `y = ${fmt(y, 2)} m`, {
+    // the fall so far, just under P and never on the floor: at landing the fall line
+    // has no length left, and beside the ball it used to sit on the "ground" label
+    T(svg, pP.x - 6, Math.min(pP.y + 22, GROUND - 14), `y = ${fmt(y, 2)} m`, {
       fill: C.ink, "font-size": 12, "text-anchor": "end",
     });
 
@@ -205,7 +216,7 @@ function q6(root) {
     mark(r1, true, `P and Q reach the ground at the same time (t = ${fmt(TF, 2)} s) — the vertical motion is the same.`);
     // (2) is false for the question as printed, whatever the slider says: Q always
     // carries the horizontal u as well. u = 0 is a special case, not the statement.
-    mark(r2, false, "P and Q have the same speed on reaching the ground — false: Q also has the horizontal u, so its speed is √(u² + v_y²) > v_y.");
+    mark(r2, false, "P and Q have the same speed on reaching the ground — false: Q also keeps the horizontal u, so it lands faster than P.");
     mark(r3, true, "P and Q have the same acceleration: g, whatever their masses.");
   };
 
