@@ -502,12 +502,11 @@ function placeCtl(qa, els) {
   const y0 = parseFloat(qa.style.top) || 0;
   const fig = figureLeft(qa, y0, y0 + qa.offsetHeight, x0);
   const figLimit = fig == null ? Infinity : fig - x0 - FIG_MARGIN - width - (side ? 24 : 0);
-  // The strip stays inside the region (and clear of a figure beside it). When the
-  // answer uses the whole width there is no room after the ink, so the strip keeps
-  // the gap reserved for it at the region's right edge instead of sitting on the text.
-  const hardRight = Math.max(0, Math.min(limit, figLimit));
-  let left = Math.min(right + 6 + bar, hardRight);
-  if (left < right + 2 + bar) left = hardRight;
+  let left = Math.min(right + 6 + bar, limit, figLimit);
+  // Never start on top of the working. When the region's edge or a figure beside it
+  // leaves no paper after the ink, the strip goes past the ink (over the margin)
+  // rather than hiding a line of maths.
+  if (left < right + 2 + bar) left = Math.max(right + 2 + bar, Math.min(right + 6 + bar, limit));
   ctl.style.left = `${Math.max(0, left)}px`;
   ctl.style.right = "auto";
   ctl.dataset.home = ctl.style.left;
@@ -1155,15 +1154,19 @@ export function layoutAnswers(world, layout) {
     if (sheet) growSheet(sheet, page);
   }
   // An answer's width is final only once its lines have been measured (fonts, KaTeX,
-  // a page opened under the region), so place every control strip again afterwards:
-  // a strip measured against a half-built answer lands on top of the working.
-  for (const page of layout.pages) {
-    for (const q of page.questions) {
-      const qa = world.querySelector(`.qa[data-q="${q.id}"]`);
-      const inner = qa?.querySelector(".qa-in");
-      if (inner) placeCtl(qa, [...inner.children]);
+  // a page opened under the region). Place every strip again, once more after the
+  // next paint, so no strip is left where a half-built answer put it.
+  const placeAgain = () => {
+    for (const page of layout.pages) {
+      for (const q of page.questions) {
+        const qa = world.querySelector(`.qa[data-q="${q.id}"]`);
+        const inner = qa?.querySelector(".qa-in");
+        if (inner) placeCtl(qa, [...inner.children]);
+      }
     }
-  }
+  };
+  placeAgain();
+  requestAnimationFrame(() => requestAnimationFrame(placeAgain));
 }
 
 /** Shows the first n steps of a question; hidden steps keep their space. */
@@ -1181,6 +1184,10 @@ export function paint(root, id, n) {
   root.querySelectorAll(`.qa[data-q="${id}"]`).forEach((el) => {
     el.classList.toggle("done", done);
     el.classList.toggle("fresh", n === 0);
+    // Revealing a step changes the working's width, so place the strip again:
+    // otherwise it keeps the seat it had while the answer was still empty.
+    const inner = el.querySelector(".qa-in");
+    if (inner) placeCtl(el, [...inner.children]);
   });
   root.querySelectorAll(`.mcl[data-q="${id}"], .ring[data-q="${id}"]`).forEach((el) => el.classList.toggle("show", done));
 }
