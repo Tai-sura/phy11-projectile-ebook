@@ -3,7 +3,7 @@
  * Built from the shared kit; house rules are docs/03-authoring-style.md.
  */
 
-import { C, S, T, scene, clear, slider, readout, question, buttonRow, fmt, niceStep } from "../../engine/widgets/kit.js";
+import { C, S, T, H, scene, clear, slider, readout, question, buttonRow, fmt, niceStep } from "../../engine/widgets/kit.js";
 
 const G = 9.81;
 
@@ -109,7 +109,112 @@ function q14(root) {
   draw();
 }
 
-const REGISTRY = { q14 };
+/* ---------- Q6: dropping and projecting, side by side ---------- */
+
+function q6(root) {
+  const W = 660, HT = 360, G = 9.81, HM = 5;           // 5 m drop, same for both
+  const TF = Math.sqrt((2 * HM) / G);                  // time to fall 5 m
+  const TMAX = Math.ceil(TF * 100) / 100;              // a slider max the step can reach
+  const SC = 30;                                       // px per metre, both axes
+  const GROUND = 320, Y0 = GROUND - HM * SC;           // release height in px
+  const XP = 150, XQ = 240;
+
+  const svg = scene(W, HT);
+  const su = slider({ label: "Q's horizontal speed u (m s⁻¹)", min: 1, max: 12, step: 1, value: 8 });
+  const st = slider({ label: "Time t (s)", min: 0, max: TMAX, step: 0.01, value: Math.round(TMAX * 60) / 100, fmt: (v) => fmt(v, 2) });
+  const r = readout();
+  const rows = H("div", { style: "font:13px/1.7 ui-sans-serif,system-ui;margin:6px 0 10px;color:#222" }, []);
+  const row = (n) => H("div", { style: "display:flex;gap:8px;align-items:center" }, [
+    H("span", { style: "width:16px;font-weight:700", id: `q6s${n}` }, ["·"]),
+    H("span", {}, [""]),
+  ]);
+  const r1 = row(1), r2 = row(2), r3 = row(3);
+  rows.append(r1, r2, r3);
+  const mark = (el, ok, text) => {
+    el.firstChild.textContent = ok ? "✓" : "✗";
+    el.firstChild.style.color = ok ? "#1d8a4a" : "#c0392b";
+    el.lastChild.textContent = text;
+  };
+
+  root.append(
+    question(
+      "Ball $P$ is released from rest while ball $Q$ is projected horizontally from the same height at the same moment. The mass of $P$ is twice the mass of $Q$. Which statements are correct?",
+      ["$h = 5$ m, $g = 9.81$ m s$^{-2}$", "both fall the same $y = \\tfrac{1}{2}gt^2$"],
+    ),
+    svg, su.el, st.el, r.el, rows,
+    buttonRow([
+      ["u = 1 (a slow throw)", () => su.set(1)],
+      ["u = 8 m s⁻¹", () => su.set(8)],
+      ["t = 0", () => st.set(0)],
+      ["t = time to fall", () => st.set(TF)],
+    ]),
+  );
+
+  const draw = () => {
+    const u = su.get(), t = st.get();
+    const tt = Math.min(t, TF);                // the slider may sit a hundredth past the ground
+    const y = 0.5 * G * tt * tt;               // fall in metres, the same for P and Q
+    const vy = G * tt;
+    const xq = XQ + u * t * SC;
+    const pP = { x: XP, y: Y0 + y * SC };
+    const pQ = { x: Math.min(xq, W - 90), y: Y0 + y * SC };
+
+    clear(svg);
+    // ground and release height
+    S("line", { x1: 60, y1: GROUND, x2: W - 20, y2: GROUND, stroke: C.line, "stroke-width": 3 }, svg);
+    S("line", { x1: 60, y1: Y0, x2: W - 20, y2: Y0, stroke: C.soft, "stroke-width": 1, "stroke-dasharray": "5 5" }, svg);
+    T(svg, W - 150, Y0 - 8, `same height: ${HM} m`, { fill: C.grey, "font-size": 12 });
+    T(svg, 64, GROUND + 18, "ground", { fill: C.grey, "font-size": 12 });
+
+    // the height each ball has fallen, drawn under both
+    for (const p of [pP, pQ]) {
+      S("line", { x1: p.x, y1: p.y, x2: p.x, y2: GROUND, stroke: C.soft, "stroke-width": 1, "stroke-dasharray": "3 4" }, svg);
+    }
+    // the line joining them: always level, so they hit the ground together
+    S("line", { x1: pP.x, y1: pP.y, x2: pQ.x, y2: pQ.y, stroke: C.green, "stroke-width": 2, "stroke-dasharray": "6 4" }, svg);
+    T(svg, 70, Y0 - 26, "same height at every instant", {
+      fill: C.green, "font-size": 12, "font-weight": 700,
+    });
+
+    // the balls
+    S("circle", { cx: pP.x, cy: pP.y, r: 9, fill: C.amberSoft, stroke: C.amber, "stroke-width": 2 }, svg);
+    T(svg, pP.x, pP.y + 4, "P", { fill: C.ink, "font-size": 12, "font-weight": 700, "text-anchor": "middle" });
+    S("circle", { cx: pQ.x, cy: pQ.y, r: 9, fill: C.blueSoft, stroke: C.blue, "stroke-width": 2 }, svg);
+    T(svg, pQ.x, pQ.y + 4, "Q", { fill: C.ink, "font-size": 12, "font-weight": 700, "text-anchor": "middle" });
+    if (u > 0) {
+      const x1 = pQ.x + 12, x2 = Math.min(x1 + Math.min(u * 5, 70), W - 8);
+      S("line", { x1, y1: pQ.y, x2, y2: pQ.y, stroke: C.blue, "stroke-width": 2 }, svg);
+      S("polygon", { points: `${x2},${pQ.y} ${x2 - 8},${pQ.y - 4} ${x2 - 8},${pQ.y + 4}`, fill: C.blue }, svg);
+      T(svg, x1, pQ.y - 10, `u = ${u} m s⁻¹`, { fill: C.blue, "font-size": 12 });
+    }
+    // fall height readout beside P (it used to sit on the "same height" line at t = 0)
+    T(svg, pP.x - 14, pP.y + 4, `y = ${fmt(y, 2)} m`, {
+      fill: C.ink, "font-size": 12, "text-anchor": "end",
+    });
+
+    const landed = t >= TF - 0.001;
+    r.set(
+      `t = ${fmt(tt, 2)}\\ \\text{s}:\\quad y = \\tfrac{1}{2}(9.81)(${fmt(tt, 2)})^2 = ${fmt(y, 2)}\\ \\text{m}` +
+        `\\quad v_y = 9.81(${fmt(tt, 2)}) = ${fmt(vy, 2)}\\ \\text{m s}^{-1}`,
+      landed ? true : null,
+      landed
+        ? `Both land at t = ${fmt(TF, 2)} s. Q is faster (v = ${fmt(Math.hypot(u, vy), 2)} m s⁻¹ against P's ${fmt(vy, 2)}), but the same v_y.`
+        : "Drag the time: both balls keep the same height at every instant.",
+    );
+
+    mark(r1, true, `P and Q reach the ground at the same time (t = ${fmt(TF, 2)} s) — the vertical motion is the same.`);
+    // (2) is false for the question as printed, whatever the slider says: Q always
+    // carries the horizontal u as well. u = 0 is a special case, not the statement.
+    mark(r2, false, "P and Q have the same speed on reaching the ground — false: Q also has the horizontal u, so its speed is √(u² + v_y²) > v_y.");
+    mark(r3, true, "P and Q have the same acceleration: g, whatever their masses.");
+  };
+
+  su.on(draw);
+  st.on(draw);
+  draw();
+}
+
+const REGISTRY = { q6, q14 };
 
 export function hasGraphic(id) {
   return Boolean(REGISTRY[id]);
