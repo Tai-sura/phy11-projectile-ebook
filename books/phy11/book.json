@@ -390,5 +390,20 @@
         "space": 110
       }
     }
-  }
+  },
+  "media": [
+    {
+      "page": 1,
+      "region": [
+        40,
+        103,
+        577,
+        318
+      ],
+      "scene": "phy11:ResolvingVelocity",
+      "src": "media/resolving.mp4",
+      "poster": "media/resolving.jpg",
+      "title": "Resolve v into vx and vy"
+    }
+  ]
 }
