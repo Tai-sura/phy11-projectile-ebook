@@ -13,7 +13,7 @@ export const SOLUTIONS = [
     letter: "C",
     boxes: [{
       steps: [
-        m("t = \\frac{2}{5} = 0.4\\ \\text{s}", "x = u_x t"),
+        m("t = \\frac{2}{5} = 0.4\\ \\text{s}", "horizontal speed is constant"),
         t("The height of the table is"),
         m("s = ut + \\frac{1}{2}at^2"),
         m("s_y = \\frac{1}{2}(-9.8)(0.4)^2", "take upward as +ve"),
