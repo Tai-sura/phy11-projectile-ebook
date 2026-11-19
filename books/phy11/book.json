@@ -1,0 +1,394 @@
+{
+  "id": "phy11",
+  "form": "S4",
+  "code": "PHY CH11",
+  "title": "Projectile Motion",
+  "topic": "Projectile Motion",
+  "year": 2026,
+  "status": "draft",
+  "storage": "phy11",
+  "source": {
+    "que": "source/Chapter 11 Projectile motion - 2022-2023 regular @Uni.pdf",
+    "ans": "source/Chapter 11 Projectile motion - 2022-2023 regular(ANS) @Uni.pdf",
+    "ansPageOffset": 0
+  },
+  "sections": [
+    {
+      "id": "mc",
+      "label": "MC"
+    }
+  ],
+  "continuation": {
+    "top": 96,
+    "x": 48,
+    "width": 499,
+    "bottom": 812
+  },
+  "extract": {
+    "zoom": 3,
+    "regionX": [
+      66,
+      546
+    ],
+    "footer": 822,
+    "questions": [
+      {
+        "id": "q1",
+        "page": 2,
+        "label": "1",
+        "section": "mc"
+      },
+      {
+        "id": "q2",
+        "page": 2,
+        "label": "2",
+        "section": "mc"
+      },
+      {
+        "id": "q3",
+        "page": 2,
+        "label": "3",
+        "section": "mc"
+      },
+      {
+        "id": "q4",
+        "page": 2,
+        "label": "4",
+        "section": "mc"
+      },
+      {
+        "id": "q5",
+        "page": 3,
+        "label": "5",
+        "section": "mc"
+      },
+      {
+        "id": "q6",
+        "page": 3,
+        "label": "6",
+        "section": "mc"
+      },
+      {
+        "id": "q7",
+        "page": 3,
+        "label": "7",
+        "section": "mc"
+      },
+      {
+        "id": "q8",
+        "page": 4,
+        "label": "8",
+        "section": "mc"
+      },
+      {
+        "id": "q9",
+        "page": 5,
+        "label": "9",
+        "section": "mc"
+      },
+      {
+        "id": "q10",
+        "page": 5,
+        "label": "10",
+        "section": "mc"
+      },
+      {
+        "id": "q11",
+        "page": 5,
+        "label": "11",
+        "section": "mc"
+      },
+      {
+        "id": "q12",
+        "page": 6,
+        "label": "12",
+        "section": "mc"
+      },
+      {
+        "id": "q13",
+        "page": 6,
+        "label": "13",
+        "section": "mc"
+      },
+      {
+        "id": "q14",
+        "page": 7,
+        "label": "14",
+        "section": "mc"
+      },
+      {
+        "id": "q15",
+        "page": 7,
+        "label": "15",
+        "section": "mc"
+      },
+      {
+        "id": "q16",
+        "page": 7,
+        "label": "16",
+        "section": "mc"
+      },
+      {
+        "id": "q17",
+        "page": 8,
+        "label": "17",
+        "section": "mc"
+      },
+      {
+        "id": "q18",
+        "page": 8,
+        "label": "18",
+        "section": "mc"
+      },
+      {
+        "id": "q19",
+        "page": 9,
+        "label": "19",
+        "section": "mc"
+      },
+      {
+        "id": "q20",
+        "page": 10,
+        "label": "20",
+        "section": "mc"
+      }
+    ],
+    "anchors": {},
+    "fixedAnchors": {},
+    "overrides": {
+      "q1": {
+        "square": [
+          545.2,
+          186.8,
+          573.8,
+          215.2
+        ],
+        "region": [
+          66,
+          190,
+          505,
+          250
+        ],
+        "space": 165
+      },
+      "q10": {
+        "region": [
+          66,
+          462,
+          505,
+          555
+        ],
+        "space": 241
+      },
+      "q11": {
+        "region": [
+          66,
+          631,
+          396,
+          812
+        ],
+        "space": 45
+      },
+      "q12": {
+        "region": [
+          66,
+          168,
+          505,
+          280
+        ],
+        "space": 335
+      },
+      "q13": {
+        "region": [
+          66,
+          566,
+          505,
+          812
+        ],
+        "space": 224
+      },
+      "q14": {
+        "square": [
+          549.0,
+          445.3,
+          577.5,
+          473.8
+        ],
+        "region": [
+          150,
+          412,
+          505,
+          540
+        ]
+      },
+      "q15": {
+        "square": [
+          547.7,
+          579.3,
+          576.2,
+          607.8
+        ],
+        "region": [
+          140,
+          590,
+          332,
+          682
+        ],
+        "space": 142
+      },
+      "q16": {
+        "square": [
+          545.8,
+          733.8,
+          574.3,
+          762.3
+        ],
+        "region": [
+          120,
+          713,
+          505,
+          792
+        ],
+        "space": 80
+      },
+      "q17": {
+        "region": [
+          66,
+          302,
+          505,
+          410
+        ],
+        "space": 190
+      },
+      "q18": {
+        "region": [
+          66,
+          600,
+          357,
+          812
+        ],
+        "space": 140
+      },
+      "q19": {
+        "region": [
+          66,
+          272,
+          505,
+          790
+        ],
+        "space": 206
+      },
+      "q2": {
+        "square": [
+          545.8,
+          284.3,
+          574.2,
+          312.8
+        ],
+        "region": [
+          66,
+          364,
+          352,
+          412
+        ],
+        "space": 158
+      },
+      "q20": {
+        "region": [
+          66,
+          258,
+          505,
+          790
+        ],
+        "space": 95
+      },
+      "q3": {
+        "square": [
+          545.2,
+          455.9,
+          573.8,
+          484.4
+        ],
+        "region": [
+          112,
+          452,
+          505,
+          581
+        ],
+        "space": 132
+      },
+      "q4": {
+        "square": [
+          549.2,
+          737.0,
+          577.8,
+          765.5
+        ],
+        "region": [
+          66,
+          700,
+          392,
+          782
+        ],
+        "space": 184
+      },
+      "q5": {
+        "region": [
+          66,
+          130,
+          392,
+          268
+        ],
+        "space": 179
+      },
+      "q6": {
+        "square": [
+          552.8,
+          435.0,
+          581.2,
+          463.5
+        ],
+        "region": [
+          66,
+          462,
+          505,
+          528
+        ],
+        "space": 200
+      },
+      "q7": {
+        "region": [
+          66,
+          606,
+          392,
+          812
+        ],
+        "space": 35
+      },
+      "q8": {
+        "region": [
+          66,
+          658,
+          396,
+          800
+        ],
+        "space": 148
+      },
+      "q9": {
+        "square": [
+          552.5,
+          131.0,
+          581.0,
+          159.5
+        ],
+        "region": [
+          112,
+          130,
+          386,
+          250
+        ],
+        "space": 121
+      }
+    }
+  }
+}
