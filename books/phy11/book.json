@@ -434,6 +434,23 @@
         -14,
         14
       ]
+    },
+    {
+      "page": 7,
+      "region": [
+        344,
+        80,
+        562,
+        244
+      ],
+      "scene": "phy11:ProjectileRanges",
+      "src": "media/projectile-ranges.mp4",
+      "poster": "media/projectile-ranges.png",
+      "title": "Same range, different flight times",
+      "ctrl": [
+        -14,
+        14
+      ]
     }
   ]
 }
