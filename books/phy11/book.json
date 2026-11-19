@@ -417,6 +417,23 @@
       "src": "media/horizontal-projectile.mp4",
       "poster": "media/horizontal-projectile.jpg",
       "title": "Two motions at once"
+    },
+    {
+      "page": 4,
+      "region": [
+        50,
+        108,
+        478,
+        281
+      ],
+      "scene": "phy11:ProjectileAngle",
+      "src": "media/projectile-angle.mp4",
+      "poster": "media/projectile-angle.jpg",
+      "title": "vx stays, vy reaches zero at the top",
+      "ctrl": [
+        -14,
+        14
+      ]
     }
   ]
 }

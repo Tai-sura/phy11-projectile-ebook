@@ -26,8 +26,11 @@ export function addMedia(pageNo, overlay) {
     button.type = "button";
     button.className = "media-play";
     button.dataset.media = String(n);
-    button.style.right = `${-Math.min(HALF, PAGE_W - EDGE - x1)}px`;
-    button.style.top = `${-Math.min(HALF, y0 - EDGE)}px`;
+    // item.ctrl = [dx, dy] (pt) nudges the button off the panel's top-right corner, for a panel whose
+    // printed frame line runs through that corner; +dx moves it right, +dy moves it down. Omitted = 0.
+    const [dx, dy] = item.ctrl || [0, 0];
+    button.style.right = `${-Math.min(HALF, PAGE_W - EDGE - x1) - dx}px`;
+    button.style.top = `${-Math.min(HALF, y0 - EDGE) + dy}px`;
     const title = item.title || "Play the animation";
     const label = (text, what) => {
       button.textContent = text;
