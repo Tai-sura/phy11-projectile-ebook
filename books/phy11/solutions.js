@@ -323,8 +323,7 @@ export const SOLUTIONS = [
     links: [{ key: "a42", color: "blue", note: "angle to the horizontal", q: ["angle 42o"] }],
     boxes: [{
       steps: [
-        lk("a42", m("u_y = 40\\sin 42^\\circ,\\ v_y = -40\\sin 42^\\circ")),
-        m("a = -9.81\\ \\text{m s}^{-2}", "take upward as +ve"),
+        lk("a42", m("u_y = 40\\sin 42^\\circ,\\ v_y = -40\\sin 42^\\circ,\\ a = -9.81", "upward +ve")),
         m("v_y = u_y + at \\Rightarrow t = 5.46\\ \\text{s}"),
         m("R = 40\\cos 42^\\circ \\times 5.46 = \\underline{162\\ \\text{m}}"),
         m("\\therefore \\text{The answer is B.}"),
