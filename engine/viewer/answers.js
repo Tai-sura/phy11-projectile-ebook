@@ -502,8 +502,12 @@ function placeCtl(qa, els) {
   const y0 = parseFloat(qa.style.top) || 0;
   const fig = figureLeft(qa, y0, y0 + qa.offsetHeight, x0);
   const figLimit = fig == null ? Infinity : fig - x0 - FIG_MARGIN - width - (side ? 24 : 0);
-  let left = Math.min(right + 6 + bar, limit, figLimit);
-  if (left < right + 2 + bar) left = Math.min(right + 6 + bar, figLimit);
+  // The strip stays inside the region (and clear of a figure beside it). When the
+  // answer uses the whole width there is no room after the ink, so the strip keeps
+  // the gap reserved for it at the region's right edge instead of sitting on the text.
+  const hardRight = Math.max(0, Math.min(limit, figLimit));
+  let left = Math.min(right + 6 + bar, hardRight);
+  if (left < right + 2 + bar) left = hardRight;
   ctl.style.left = `${Math.max(0, left)}px`;
   ctl.style.right = "auto";
   ctl.dataset.home = ctl.style.left;
@@ -1149,6 +1153,16 @@ export function layoutAnswers(world, layout) {
     }
     const sheet = world.querySelector(`.sheet[data-key="p${page.page}"]`);
     if (sheet) growSheet(sheet, page);
+  }
+  // An answer's width is final only once its lines have been measured (fonts, KaTeX,
+  // a page opened under the region), so place every control strip again afterwards:
+  // a strip measured against a half-built answer lands on top of the working.
+  for (const page of layout.pages) {
+    for (const q of page.questions) {
+      const qa = world.querySelector(`.qa[data-q="${q.id}"]`);
+      const inner = qa?.querySelector(".qa-in");
+      if (inner) placeCtl(qa, [...inner.children]);
+    }
   }
 }
 
