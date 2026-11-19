@@ -965,14 +965,19 @@ const BLANK = new Map();
 /** Page image pixels at 1px per point, so a figure's left edge can be found. */
 const PIXELS = new WeakMap();
 
-function pagePixels(img) {
-  if (PIXELS.has(img)) return PIXELS.get(img);
+/** Height in page points of a page image: A4, unless the PDF page was opened up. */
+function pageHeightOf(img) {
+  if (!img || !img.naturalWidth) return PAGE_H;
+  return Math.round(PAGE_W * (img.naturalHeight / img.naturalWidth));
+}
+
+function pagePixels(img) {  if (PIXELS.has(img)) return PIXELS.get(img);
   if (!img.complete || !img.naturalWidth) {
     img.addEventListener("load", () => rowsReady?.(), { once: true });
     return null;
   }
   const w = Math.round(PAGE_W);
-  const h = Math.round(PAGE_H);
+  const h = Math.round(pageHeightOf(img));
   const canvas = document.createElement("canvas");
   canvas.width = w;
   canvas.height = h;
@@ -998,7 +1003,7 @@ function figureLeft(qa, y0, y1, xFrom) {
   const data = img && pagePixels(img);
   if (!data) return null;
   const w = Math.round(PAGE_W);
-  const h = Math.round(PAGE_H);
+  const h = Math.round(pageHeightOf(img));
   const top = Math.max(0, Math.floor(y0));
   const bot = Math.min(h - 1, Math.ceil(y1));
   const from = Math.max(0, Math.floor(xFrom));
@@ -1025,7 +1030,7 @@ function blankRows(img) {
     return null;
   }
   const w = Math.round(PAGE_W);
-  const h = Math.round(PAGE_H);
+  const h = Math.round(pageHeightOf(img));
   const canvas = document.createElement("canvas");
   canvas.width = w;
   canvas.height = h;
@@ -1075,6 +1080,9 @@ function cutFor(rows, y0, y1) {
  * back at 100%.
  */
 function growSheet(sheet, page) {
+  // A page may be taller than A4 when its source PDF was opened up to make room
+  // for an answer (tools/relayout_pdf.py); slicing must use that page's own height.
+  const pageH = page.height || PAGE_H;
   const img = sheet.querySelector("img.bg");
   const cuts = [];
   let grown = false;
@@ -1097,7 +1105,7 @@ function growSheet(sheet, page) {
   const shift = (y) => merged.reduce((s, c) => (y >= c.y ? s + c.d : s), 0);
   sheet.shiftY = merged.length ? (y) => y + shift(y) : null;
   sheet.classList.toggle("grown", grown);
-  sheet.style.height = `${PAGE_H + merged.reduce((s, c) => s + c.d, 0)}px`;
+  sheet.style.height = `${pageH + merged.reduce((s, c) => s + c.d, 0)}px`;
   for (const el of sheet.querySelector(".overlay").children) {
     if (el.classList.contains("rev")) continue;
     if (!("y" in el.dataset)) el.dataset.y = parseFloat(el.style.top) || 0;
@@ -1110,7 +1118,7 @@ function growSheet(sheet, page) {
   let from = 0;
   let off = 0;
   let after = img;
-  for (const c of [...merged, { y: PAGE_H, d: 0 }]) {
+  for (const c of [...merged, { y: pageH, d: 0 }]) {
     const slice = document.createElement("div");
     slice.className = "bg-slice";
     slice.dataset.from = from;
@@ -1121,6 +1129,10 @@ function growSheet(sheet, page) {
     part.alt = "";
     part.draggable = false;
     part.style.top = `${-from}px`;
+    // The slice is a window onto the whole page: the image keeps the page's own
+    // height (a page opened up by relayout_pdf.py is taller than A4), then slides
+    // up by `from` so the band shows at the right place.
+    part.style.height = `${pageH}px`;
     slice.append(part);
     after.after(slice);
     after = slice;

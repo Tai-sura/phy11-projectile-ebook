@@ -209,7 +209,7 @@ function pageBackground(src) {
 function buildPages() {
   world.replaceChildren();
   for (const page of state.layout.pages) {
-    const sheet = makeSheet(`p${page.page}`, page.page, pageImage(page.page));
+    const sheet = makeSheet(`p${page.page}`, page.page, pageImage(page.page), page.height || PAGE_H);
     const overlay = document.createElement("div");
     overlay.className = "overlay";
     buildOverlay(page, overlay);

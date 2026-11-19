@@ -8,7 +8,7 @@
   "status": "draft",
   "storage": "phy11",
   "source": {
-    "que": "source/Chapter 11 Projectile motion - 2022-2023 regular @Uni.pdf",
+    "que": "source/Chapter 11 Projectile motion - 2022-2023 regular (p7 opened) @Uni.pdf",
     "ans": "source/Chapter 11 Projectile motion - 2022-2023 regular(ANS) @Uni.pdf",
     "ansPageOffset": 0
   },
@@ -218,8 +218,9 @@
           150,
           412,
           505,
-          540
-        ]
+          550
+        ],
+        "space": 30
       },
       "q15": {
         "square": [
@@ -230,11 +231,11 @@
         ],
         "region": [
           140,
-          590,
+          628,
           332,
           682
         ],
-        "space": 142
+        "space": 190
       },
       "q16": {
         "square": [
@@ -247,7 +248,7 @@
           150,
           731,
           505,
-          796
+          930
         ]
       },
       "q17": {
