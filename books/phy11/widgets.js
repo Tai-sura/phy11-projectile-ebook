@@ -30,14 +30,12 @@ function q14(root) {
     ]),
   );
 
-  // plot frame, redrawn on every change
+  // plot frame, redrawn on every change — but the frame itself never moves: 2 px per metre on
+  // both axes (500 px / 250 m = 186 px / 93 m), so the 25 m grid is fixed and R can be compared
+  // directly as u changes. It covers the largest shot the sliders allow (u = 40 at 85°).
   const X0 = 66, Y0 = 252, PW = 500, PH = 186;
+  const XMAX = 250, YMAX = 93;
 
-  const nice = (v) => {
-    if (!(v > 0)) return 1;
-    const s = niceStep(v, 6);
-    return Math.ceil(v / s - 1e-9) * s;
-  };
   // keep as many decimals as the tick step needs, else a 0.5 m step prints "1, 1, 2"
   const tick = (v, step) => v.toFixed(String(step).split(".")[1]?.length || 0);
 
@@ -49,12 +47,6 @@ function q14(root) {
     const R = (u * u * Math.sin(2 * th)) / G;
     const Hm = (uy * uy) / (2 * G);
 
-    // One scale on both axes (the same px per metre), so a trajectory keeps its true shape and
-    // the frame no longer jumps when the angle changes: the limit is set by the speed alone,
-    // from the longest range (45°) and the tallest apex (85°). Changing u still reframes.
-    const span = Math.max((u * u) / G, Math.pow(u * Math.sin((85 * Math.PI) / 180), 2) / (2 * G) * (PW / PH));
-    const XMAX = nice(span * 1.06);
-    const YMAX = (XMAX * PH) / PW;
     const px = (x) => X0 + (x / XMAX) * PW;
     const py = (y) => Y0 - (y / YMAX) * PH;
 
