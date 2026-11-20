@@ -219,6 +219,18 @@ function q6(root) {
     S("line", { x1: 60, y1: Y0, x2: W - 20, y2: Y0, stroke: C.soft, "stroke-width": 1, "stroke-dasharray": "5 5" }, svg);
     T(svg, 64, GROUND + 16, "ground", { fill: C.grey, "font-size": 12 });
 
+    // the two paths, each in its own colour and dashed: P straight down, Q the parabola. Drawn
+    // before the footprints so the 0.2 s circles stay whole on top of them.
+    S("line", { x1: XP, y1: Y0, x2: XP, y2: GROUND, stroke: C.red, "stroke-width": 1.6,
+      "stroke-dasharray": "5 5", opacity: 0.55 }, svg);
+    const qpath = [];
+    for (let i = 0; i <= 48; i++) {
+      const tk = (i / 48) * TF;
+      qpath.push(`${(XQ + u * tk * SC).toFixed(1)},${(Y0 + 0.5 * G * tk * tk * SC).toFixed(1)}`);
+    }
+    S("polyline", { points: qpath.join(" "), fill: "none", stroke: C.blue, "stroke-width": 1.6,
+      "stroke-dasharray": "5 5", opacity: 0.55 }, svg);
+
     // the stroboscope: one pair of footprints for every 0.2 s the time has gone past.
     // The pair shares one y, and the +Δy on P's column is the step between two of them.
     let prev = 0;
