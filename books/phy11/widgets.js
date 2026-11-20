@@ -49,23 +49,26 @@ function q14(root) {
     const R = (u * u * Math.sin(2 * th)) / G;
     const Hm = (uy * uy) / (2 * G);
 
-    // axes follow the shot, so the curve always fills the frame
-    const XMAX = nice(R * 1.08);
-    const YMAX = nice(Hm * 1.25);
+    // One scale on both axes (the same px per metre), so a trajectory keeps its true shape and
+    // the frame no longer jumps when the angle changes: the limit is set by the speed alone,
+    // from the longest range (45°) and the tallest apex (85°). Changing u still reframes.
+    const span = Math.max((u * u) / G, Math.pow(u * Math.sin((85 * Math.PI) / 180), 2) / (2 * G) * (PW / PH));
+    const XMAX = nice(span * 1.06);
+    const YMAX = (XMAX * PH) / PW;
     const px = (x) => X0 + (x / XMAX) * PW;
     const py = (y) => Y0 - (y / YMAX) * PH;
 
     clear(svg);
 
-    const xs = niceStep(XMAX, 6);
-    const ys = niceStep(YMAX, 5);
-    for (let x = xs; x <= XMAX + 1e-9; x += xs) {
+    // one tick step on both axes too, so the grid squares are square (the same px per metre)
+    const step = niceStep(Math.min(XMAX, YMAX), 4);
+    for (let x = step; x <= XMAX + 1e-9; x += step) {
       S("line", { x1: px(x), y1: py(0), x2: px(x), y2: py(YMAX), stroke: C.soft, "stroke-width": 1 }, svg);
-      T(svg, px(x), Y0 + 17, tick(x, xs), { fill: C.grey, "font-size": 12, "text-anchor": "middle" });
+      T(svg, px(x), Y0 + 17, tick(x, step), { fill: C.grey, "font-size": 12, "text-anchor": "middle" });
     }
-    for (let y = ys; y <= YMAX + 1e-9; y += ys) {
+    for (let y = step; y <= YMAX + 1e-9; y += step) {
       S("line", { x1: px(0), y1: py(y), x2: px(XMAX), y2: py(y), stroke: C.soft, "stroke-width": 1 }, svg);
-      T(svg, X0 - 8, py(y) + 4, tick(y, ys), { fill: C.grey, "font-size": 12, "text-anchor": "end" });
+      T(svg, X0 - 8, py(y) + 4, tick(y, step), { fill: C.grey, "font-size": 12, "text-anchor": "end" });
     }
 
     // axes
