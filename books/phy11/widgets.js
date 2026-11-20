@@ -132,7 +132,7 @@ function q6(root) {
 
   const svg = scene(W, HT);
   const su = slider({ label: "Q's horizontal speed u (m s⁻¹)", min: 1, max: 12, step: 1, value: 8 });
-  const st = slider({ label: "Time t (s)", min: 0, max: TMAX, step: 0.01, value: Math.round(TMAX * 60) / 100, fmt: (v) => fmt(v, 2) });
+  const st = slider({ label: "Time t (s)", min: 0, max: TMAX, step: 0.01, value: Math.round(TMAX * 60) / 100, fmt: (v) => fmt(v, 2), play: false });
   const r = readout();
   const rows = H("div", { style: "font:13px/1.7 ui-sans-serif,system-ui;margin:6px 0 10px;color:#222" }, []);
   const row = (n) => H("div", { style: "display:flex;gap:8px;align-items:center" }, [
@@ -147,12 +147,45 @@ function q6(root) {
     el.lastChild.textContent = text;
   };
 
+  // The kit's ▶ on the time slider steps one hundredth every 650 ms, so crossing the fall
+  // would take a minute: the time gets its own play instead, 0 → the ground in about 2 s.
+  // It plays from wherever the slider stands (and starts again after the ground).
+  const playBtn = H("button", {
+    type: "button",
+    style: "margin:2px 0 8px;padding:8px 16px;border-radius:10px;border:1px solid #1d8a4a;" +
+      "background:#e3f5e9;color:#12703a;font:700 14px ui-sans-serif,system-ui;cursor:pointer",
+  }, ["▶ 自動播放時間"]);
+  const pbar = H("div", {}, [playBtn]);
+  let raf = 0, auto = false;
+  const stopPlay = () => {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    playBtn.textContent = "▶ 自動播放時間";
+  };
+  playBtn.addEventListener("click", () => {
+    if (raf) return stopPlay();
+    let from = st.get();
+    if (from >= TF - 0.005) { from = 0; st.set(0); }
+    const t0 = performance.now();
+    const span = 2000 * (TF - from) / TF;
+    playBtn.textContent = "❚❚ 暫停";
+    const tick = (now) => {
+      const k = Math.min(1, (now - t0) / span);
+      auto = true;
+      st.set(from + (TF - from) * k);
+      auto = false;
+      if (k < 1) raf = requestAnimationFrame(tick);
+      else { raf = 0; playBtn.textContent = "▶ 自動播放時間"; }
+    };
+    raf = requestAnimationFrame(tick);
+  });
+
   root.append(
     question(
       "Ball $P$ is released from rest while ball $Q$ is projected horizontally from the same height at the same moment. The mass of $P$ is twice the mass of $Q$. Which statements are correct?",
       ["$h = 5$ m, $g = 9.81$ m s$^{-2}$", "both fall the same $y = \\tfrac{1}{2}gt^2$"],
     ),
-    svg, su.el, st.el, r.el, rows,
+    svg, su.el, st.el, pbar, r.el, rows,
     buttonRow([
       ["u = 1 (a slow throw)", () => su.set(1)],
       ["u = 8 m s⁻¹", () => su.set(8)],
@@ -178,7 +211,7 @@ function q6(root) {
 
     clear(svg);
     T(svg, 64, 14, "每 0.2 s 一個腳印：紅＝P 自由落、藍＝Q 水平拋出", { fill: C.ink, "font-size": 12 });
-    T(svg, 64, 32, "綠虛線＝同一時刻同高　+Δy＝該段垂直落距　h = 5 m", { fill: C.grey, "font-size": 12 });
+    T(svg, 64, 32, "綠虛線＝同一時刻同高　紅/藍箭＝同一 v_y　+Δy＝該段垂直落距　h = 5 m", { fill: C.grey, "font-size": 12 });
 
     // the floor and the height they are released from
     S("line", { x1: 60, y1: GROUND, x2: W - 20, y2: GROUND, stroke: C.line, "stroke-width": 3 }, svg);
@@ -211,6 +244,20 @@ function q6(root) {
     S("circle", { cx: pQ.x, cy: pQ.y, r: 9, fill: C.blueSoft, stroke: C.blue, "stroke-width": 2 }, svg);
     T(svg, pQ.x, pQ.y + 4, "Q", { fill: C.ink, "font-size": 12, "font-weight": 700, "text-anchor": "middle" });
 
+    // The same downward velocity on both balls, from the same vy: one length, drawn above each
+    // ball so it never crosses the ground at the end (and clear of P's column of footprints,
+    // which sit on the ball's own x: the two cross, they do not merge).
+    const vlen = vy * 4.2;
+    if (vlen > 3.5) {
+      const down = (x, yb, color) => {
+        const tip = yb - 11, tail = tip - vlen, head = Math.min(6, vlen - 1);
+        S("line", { x1: x, y1: tail, x2: x, y2: tip - head + 1, stroke: color, "stroke-width": 1.8 }, svg);
+        S("polygon", { points: `${x},${tip} ${x - 4},${tip - head} ${x + 4},${tip - head}`, fill: color }, svg);
+      };
+      down(pP.x, pP.y, C.red);
+      down(pQ.x, pQ.y, C.blue);
+    }
+
     if (u > 0) {
       const x1 = pQ.x + 12, x2 = Math.min(x1 + Math.min(u * 5, 70), W - 8);
       S("line", { x1, y1: pQ.y, x2, y2: pQ.y, stroke: C.blue, "stroke-width": 2 }, svg);
@@ -226,7 +273,7 @@ function q6(root) {
       landed ? true : null,
       landed
         ? `Both land at t = ${fmt(TF, 2)} s. Q is faster (v = ${fmt(Math.hypot(u, vy), 2)} m s⁻¹ against P's ${fmt(vy, 2)}), but the same v_y.`
-        : "Drag the time: both balls keep the same height at every instant.",
+        : "Drag the time or press ▶: both balls keep the same height, and the same downward v_y.",
     );
 
     mark(r1, true, `P and Q reach the ground at the same time (t = ${fmt(TF, 2)} s) — the vertical motion is the same.`);
@@ -238,6 +285,8 @@ function q6(root) {
 
   su.on(draw);
   st.on(draw);
+  // any change that is not the play loop itself (a drag, a nudge, a preset) stops the play
+  st.on(() => { if (!auto) stopPlay(); });
   draw();
 }
 
