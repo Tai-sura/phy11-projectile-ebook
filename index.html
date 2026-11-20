@@ -61,9 +61,20 @@
   <script type="module">
     const shelf = document.getElementById("shelf");
     const filter = document.getElementById("filter");
-    const { books: ids } = await fetch("books/catalog.json").then((r) => r.json());
-    const books = (await Promise.all(ids.map((id) =>
-      fetch(`books/${id}/book.json`).then((r) => (r.ok ? r.json() : null)).catch(() => null)))).filter(Boolean);
+    const { books: ids } = await fetch("books/catalog.json", { cache: "no-store" }).then((r) => r.json());
+    // A book listed in the catalogue can be missing for a minute while Pages finishes a deploy, and a
+    // dropped entry looks like "the new book is not there". Retry once before giving up on it.
+    const loadBook = async (id) => {
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+          const r = await fetch(`books/${id}/book.json`, { cache: "no-store" });
+          if (r.ok) return await r.json();
+        } catch { /* offline; try again */ }
+        await new Promise((done) => setTimeout(done, 1200));
+      }
+      return null;
+    };
+    const books = (await Promise.all(ids.map(loadBook))).filter(Boolean);
     const name = (b) => [b.code, b.title].filter(Boolean).join(" ");
     const href = (b) => `reader.html?book=${encodeURIComponent(b.id)}`;
 
