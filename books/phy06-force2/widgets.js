@@ -5,7 +5,7 @@
  * bar models, MC checkers).
  */
 
-import { C, S, T, scene, clear, slider, readout, question, buttonRow, sector } from "../../engine/widgets/kit.js";
+import { C, S, T, scene, clear, slider, readout, question, buttonRow, sector, tabs } from "../../engine/widgets/kit.js";
 
 /* ---------------- Q9: two strings hold a weight — the angles fix the tensions ----------------
  *
@@ -150,8 +150,186 @@ function q9(root) {
   render();
 }
 
+/* ---------------- Q35: the inclined-plane bench ----------------
+ *
+ * One set of live numbers behind three modes (g = 9.81, Y is the fixed 3 kg mass):
+ *   free slide   a = g sin θ                                   (22.5° → 3.754)
+ *   held by F    F = m g tan θ,  N = m g cos θ + F sin θ        (22.5°, 5 kg → 20.32 N, 53.09 N)
+ *   pulley       a = (m_Y g − m g sin θ) / (m + m_Y),  X up    (22.5°, 5 kg → 1.332)
+ * With the pulley, a goes negative once sin θ > m_Y / m, i.e. θ > 36.87° at m = 5 kg; the
+ * widget then says X slides down and prints |a| with that direction, never a negative a
+ * labelled "up". Independent check (Python, g = 9.81): 3.7541 / 20.3172, 53.0913 / 1.3324 /
+ * −0.0000 at 36.87° / −1.6311 at 60°.
+ */
+const G35 = 9.81, MY35 = 3.0;
+const K35 = (v) => {
+  if (!Number.isFinite(v)) return "—";
+  const s = Math.abs(v) < 5e-3 ? "0.00" : v.toPrecision(3);
+  return s.includes("e") ? String(Number(s)) : s;
+};
+
+function q35(root) {
+  const CW = 620, CH = 330;
+  const svg = scene(CW, CH);
+  const thS = slider({ label: "θ (degrees)", min: 0, max: 60, step: 0.1, value: 22.5, fmt: (v) => `${v}°`, play: false });
+  const mS = slider({ label: "m_X (kg)", min: 1, max: 10, step: 0.5, value: 5, play: false });
+  const r = readout();
+  const state = { mode: 0 };
+
+  root.append(
+    question("Block X rides a smooth plane at θ; find a, and the horizontal force F that holds it, and the pulley case with Y = 3 kg.", [
+      "Down the plane positive: $a = g\\sin\\theta$",
+      "Held still: $F\\cos\\theta = mg\\sin\\theta$,  $N = mg\\cos\\theta + F\\sin\\theta$",
+      "With Y: $(m_Y - m_X\\sin\\theta)g = (m_X + m_Y)a$",
+    ]),
+    svg,
+    tabs(["free slide", "held by F", "pulley + 3 kg"], (i) => { state.mode = i; render(); }),
+    thS.el, mS.el, r.el,
+  );
+
+  // v–t axes, fixed scale: t 0..2.5 s, v 0..10 m/s
+  const PX0 = 54, PX1 = 318, PY0 = 42, PY1 = 250;
+  const TX = (t) => PX0 + (t / 2.5) * (PX1 - PX0);
+  const VY = (v) => PY1 - (v / 10) * (PY1 - PY0);
+
+  const render = () => {
+    clear(svg);
+    const th = thS.get(), m = mS.get(), mode = state.mode;
+    const rad = (th * Math.PI) / 180;
+    const aFree = G35 * Math.sin(rad);
+    const F = m * G35 * Math.tan(rad);
+    const N = m * G35 * Math.cos(rad) + F * Math.sin(rad);
+    const aPul = (MY35 * G35 - m * G35 * Math.sin(rad)) / (m + MY35);
+
+    /* ---- v–t plot (free slide only) ---- */
+    S("line", { x1: PX0, y1: PY1, x2: PX1 + 12, y2: PY1, stroke: C.line, "stroke-width": 1.5 }, svg);
+    S("line", { x1: PX0, y1: PY1, x2: PX0, y2: PY0 - 10, stroke: C.line, "stroke-width": 1.5 }, svg);
+    for (let t = 0; t <= 2.5; t += 0.5) {
+      S("line", { x1: TX(t), y1: PY1, x2: TX(t), y2: PY1 + 5, stroke: C.line, "stroke-width": 1 }, svg);
+      T(svg, TX(t), PY1 + 18, t === 0 ? "0" : String(t), { "text-anchor": "middle", "font-size": 11, fill: "#444" });
+    }
+    for (let v = 0; v <= 10; v += 2) {
+      S("line", { x1: PX0 - 4, y1: VY(v), x2: PX0, y2: VY(v), stroke: C.line, "stroke-width": 1 }, svg);
+      T(svg, PX0 - 8, VY(v) + 4, String(v), { "text-anchor": "end", "font-size": 11, fill: "#444" });
+    }
+    T(svg, (PX0 + PX1) / 2, PY1 + 34, "t (s)", { "text-anchor": "middle", "font-size": 12, fill: C.line });
+    T(svg, PX0 - 8, PY0 - 16, "v (m/s)", { "text-anchor": "start", "font-size": 12, fill: C.line });
+
+    if (mode === 0) {
+      // the point the printed graph gives; at θ = 22.5° the line must pass through it
+      S("circle", { cx: TX(2), cy: VY(7.5), r: 5, fill: "#fff", stroke: C.ink, "stroke-width": 2 }, svg);
+      T(svg, TX(2) + 9, VY(7.5) - 8, "printed graph", { "font-size": 10.5, fill: C.ink });
+    }
+
+    if (mode === 0) {
+      const tEnd = Math.min(2.5, 10 / Math.max(aFree, 1e-6));
+      S("line", { x1: TX(0), y1: VY(0), x2: TX(tEnd), y2: VY(aFree * tEnd), stroke: C.pink, "stroke-width": 2.6 }, svg);
+      T(svg, TX(Math.min(2.2, tEnd * 0.55)), VY(aFree * Math.min(2.2, tEnd * 0.55)) - 8, "v = a t",
+        { "font-size": 11.5, "font-weight": 700, fill: C.pink });
+    } else {
+      T(svg, (PX0 + PX1) / 2, (PY0 + PY1) / 2, mode === 1 ? "held still: a = 0" : "v–t is the free-slide case",
+        { "text-anchor": "middle", "font-size": 11.5, fill: C.grey });
+    }
+
+    /* ---- the bench: ramp, block, and the mode's extra piece ---- */
+    const BX = 372, BY = 268, L = 196;
+    const ux = Math.cos(rad), uy = -Math.sin(rad);
+    const tipX = BX + L * ux, tipY = BY + L * uy;
+    S("line", { x1: BX, y1: BY, x2: tipX, y2: tipY, stroke: C.line, "stroke-width": 2.2 }, svg);
+    S("line", { x1: BX, y1: BY, x2: tipX, y2: BY, stroke: C.line, "stroke-width": 2.2 }, svg);
+    if (th > 1) {
+      S("line", { x1: tipX, y1: tipY, x2: tipX, y2: BY, stroke: C.line, "stroke-width": 2.2 }, svg);
+    }
+    if (th > 2) {
+      sector(svg, BX, BY, 34, -rad, 0, C.amberSoft, C.amber);
+      T(svg, BX + 48 * Math.cos(-rad / 2), BY + 48 * Math.sin(-rad / 2), `θ = ${th}°`,
+        { "text-anchor": "middle", "font-size": 11.5, "font-weight": 700, fill: C.amber });
+    }
+    // block X: a 17 px square with its lower face on the hypotenuse, turned with θ
+    const hX = 8.5;
+    const dx = Math.cos(rad), dy = -Math.sin(rad), nx = Math.sin(rad), ny = -Math.cos(rad);
+    const px = BX + 0.55 * L * ux, py = BY + 0.55 * L * uy;
+    const cx = px + nx * hX, cy = py + ny * hX;
+    const corner = (a, b) => [cx + dx * a + nx * b, cy + dy * a + ny * b];
+    const pts = [corner(-hX, -hX), corner(hX, -hX), corner(hX, hX), corner(-hX, hX)];
+    S("polygon", {
+      points: pts.map((q) => q.map((v) => v.toFixed(1)).join(",")).join(" "),
+      fill: C.blueSoft, stroke: C.blue, "stroke-width": 2,
+    }, svg);
+    T(svg, cx, cy + 4, "X", { "text-anchor": "middle", "font-size": 11, "font-weight": 700, fill: C.blue });
+
+    if (mode === 1) {
+      // F leaves the block's centre and points straight out of the plane
+      const len = 12 + Math.min(F, 90) * 0.5;
+      S("line", { x1: cx, y1: cy, x2: cx + len, y2: cy, stroke: C.red, "stroke-width": 2.6,
+        "marker-end": `url(#arrRed-${svg.dataset.uid})` }, svg);
+      T(svg, cx + len + 6, cy + 4, "F", { "text-anchor": "start", "font-size": 12, "font-weight": 700, fill: C.red });
+    }
+    if (mode === 2) {
+      // the rope runs up the plane to a pulley just past the apex, then hangs clear
+      // of the wedge to the 3 kg mass Y
+      const topX = cx + nx * hX, topY = cy + ny * hX;
+      const pulX = tipX + 16, pulY = Math.min(tipY, BY - 40) - 12;
+      S("line", { x1: topX, y1: topY, x2: pulX, y2: pulY, stroke: C.line, "stroke-width": 1.6 }, svg);
+      S("circle", { cx: pulX, cy: pulY, r: 6, fill: "#fff", stroke: C.line, "stroke-width": 2 }, svg);
+      S("line", { x1: pulX, y1: pulY + 6, x2: pulX, y2: BY - 34, stroke: C.line, "stroke-width": 1.6 }, svg);
+      S("rect", { x: pulX - 15, y: BY - 34, width: 30, height: 24, fill: C.amberSoft, stroke: C.amber, "stroke-width": 2 }, svg);
+      T(svg, pulX, BY - 18, "Y", { "text-anchor": "middle", "font-size": 11, "font-weight": 700, fill: C.amber });
+    }
+
+    /* ---- the fixed readout row ---- */
+    const dash = "—";
+    const parts = [
+      mode === 2 ? `a = ${K35(Math.abs(aPul))}` : mode === 0 ? `a = ${K35(aFree)}` : `a = ${K35(0)}`,
+      mode === 1 ? `F = ${K35(F)}` : `F = ${dash}`,
+      mode === 1 ? `N = ${K35(N)}` : `N = ${dash}`,
+    ];
+    // units written explicitly, so no value can pick up the wrong one
+    const aTxt = mode === 2 ? Math.abs(aPul) : mode === 0 ? aFree : 0;
+    const fTxt = mode === 1 ? `${K35(F)}\\ \\text{N}` : "—";
+    const nTxt = mode === 1 ? `${K35(N)}\\ \\text{N}` : "—";
+    const latex = `a = ${K35(aTxt)}\\ \\text{m s}^{-2},\\quad F = ${fTxt},\\quad N = ${nTxt}`;
+    const thetaCrit = (Math.asin(Math.min(1, MY35 / m)) * 180) / Math.PI;
+    const balanced = mode === 2 && Math.abs(aPul) < 0.02;
+    let caption, ok = true, label = "live";
+    if (mode === 0) {
+      caption = `Free slide: a = g sin θ = ${K35(aFree)} m s⁻², the same for any mass.`;
+    } else if (mode === 1) {
+      caption = `Held still by a horizontal F: F = m g tan θ, N = m g cos θ + F sin θ.`;
+    } else if (balanced) {
+      ok = null; label = "";
+      caption = `Balanced: sin θ = m_Y / m_X = ${K35(MY35 / m)}, so θ ≈ ${K35(thetaCrit)}° and a = 0.`;
+    } else if (aPul < 0) {
+      caption = `θ > ${K35(thetaCrit)}°: X slides down the plane, a = ${K35(Math.abs(aPul))} m s⁻² down the plane.`;
+    } else {
+      caption = `X moves up the plane with a = ${K35(aPul)} m s⁻².`;
+    }
+    if (balanced) {
+      r.set(latex.replace(/a = /, "a = "), null,
+        `${caption}`, {}, );
+    } else {
+      r.set(latex, ok, caption, { yes: "live readings" });
+    }
+    // the balance chip, only while the pulley is in play
+    if (mode === 2) {
+      const chipText = Math.abs(th - thetaCrit) <= 1.2 ? `balanced (θ = ${K35(thetaCrit)}°)` : "";
+      if (chipText) {
+        const chip = svg.querySelector("#q35chip");
+        if (chip) chip.remove();
+        const g = S("g", {}, svg);
+        S("rect", { x: 356, y: 22, width: 236, height: 24, rx: 12, fill: C.greenSoft, stroke: C.green, "stroke-width": 1.5 }, g);
+        T(svg, 474, 38, chipText, { "text-anchor": "middle", "font-size": 12.5, "font-weight": 700, fill: C.green });
+      }
+    }
+  };
+
+  [thS, mS].forEach((s) => s.on(render));
+  render();
+}
+
 const REGISTRY = {
   q9,
+  q35,
 };
 
 export function hasGraphic(id) {
