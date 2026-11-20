@@ -1,0 +1,660 @@
+{
+  "id": "phy06-force2",
+  "form": "S4",
+  "code": "PHY CH6",
+  "title": "Force II",
+  "topic": "Resolution and addition of forces",
+  "year": 2026,
+  "status": "draft",
+  "storage": "phy06-force2",
+  "source": {
+    "que": "source/Force 2 2026-2027 regular (p3 p5 opened) @Uni.pdf",
+    "ans": "source/Force 2 2026-2027 regular (ans) @Uni.pdf",
+    "ansPageOffset": 0
+  },
+  "sections": [
+    {
+      "id": "resolve",
+      "label": "Resolution of force"
+    },
+    {
+      "id": "incline",
+      "label": "Inclined plane"
+    }
+  ],
+  "continuation": {
+    "top": 96,
+    "x": 48,
+    "width": 499,
+    "bottom": 812
+  },
+  "extract": {
+    "zoom": 3,
+    "regionX": [
+      66,
+      546
+    ],
+    "footer": 822,
+    "questions": [
+      {
+        "id": "q1",
+        "page": 1,
+        "label": "1",
+        "section": "resolve"
+      },
+      {
+        "id": "q2",
+        "page": 1,
+        "label": "2",
+        "section": "resolve"
+      },
+      {
+        "id": "q3",
+        "page": 2,
+        "label": "3",
+        "section": "resolve"
+      },
+      {
+        "id": "q4",
+        "page": 2,
+        "label": "4",
+        "section": "resolve"
+      },
+      {
+        "id": "q5",
+        "page": 2,
+        "label": "5",
+        "section": "resolve"
+      },
+      {
+        "id": "q6",
+        "page": 2,
+        "label": "6",
+        "section": "resolve"
+      },
+      {
+        "id": "q7",
+        "page": 3,
+        "label": "7",
+        "section": "resolve"
+      },
+      {
+        "id": "q8",
+        "page": 3,
+        "label": "8",
+        "section": "resolve"
+      },
+      {
+        "id": "q9",
+        "page": 3,
+        "label": "9",
+        "section": "resolve"
+      },
+      {
+        "id": "q10",
+        "page": 3,
+        "label": "10",
+        "section": "resolve"
+      },
+      {
+        "id": "q11",
+        "page": 3,
+        "label": "11",
+        "section": "resolve"
+      },
+      {
+        "id": "q12",
+        "page": 4,
+        "label": "12",
+        "section": "resolve"
+      },
+      {
+        "id": "q13",
+        "page": 4,
+        "label": "13",
+        "section": "resolve"
+      },
+      {
+        "id": "q14",
+        "page": 4,
+        "label": "14",
+        "section": "resolve"
+      },
+      {
+        "id": "q15",
+        "page": 4,
+        "label": "15",
+        "section": "resolve"
+      },
+      {
+        "id": "q16",
+        "page": 5,
+        "label": "16",
+        "section": "resolve"
+      },
+      {
+        "id": "q17",
+        "page": 5,
+        "label": "17",
+        "section": "resolve"
+      },
+      {
+        "id": "q18",
+        "page": 5,
+        "label": "18",
+        "section": "resolve"
+      },
+      {
+        "id": "q19",
+        "page": 7,
+        "label": "19",
+        "section": "incline"
+      },
+      {
+        "id": "q20",
+        "page": 7,
+        "label": "20",
+        "section": "incline"
+      },
+      {
+        "id": "q21",
+        "page": 7,
+        "label": "21",
+        "section": "incline"
+      },
+      {
+        "id": "q22",
+        "page": 7,
+        "label": "22",
+        "section": "incline"
+      },
+      {
+        "id": "q23",
+        "page": 8,
+        "label": "23",
+        "section": "incline"
+      },
+      {
+        "id": "q24",
+        "page": 8,
+        "label": "24",
+        "section": "incline"
+      },
+      {
+        "id": "q25",
+        "page": 8,
+        "label": "25",
+        "section": "incline"
+      },
+      {
+        "id": "q26",
+        "page": 8,
+        "label": "26",
+        "section": "incline"
+      },
+      {
+        "id": "q27",
+        "page": 9,
+        "label": "27",
+        "section": "incline"
+      },
+      {
+        "id": "q28",
+        "page": 9,
+        "label": "28",
+        "section": "incline"
+      },
+      {
+        "id": "q29",
+        "page": 10,
+        "label": "29",
+        "section": "incline"
+      },
+      {
+        "id": "q30",
+        "page": 11,
+        "label": "30",
+        "section": "incline"
+      },
+      {
+        "id": "q31",
+        "page": 12,
+        "label": "31",
+        "section": "incline"
+      },
+      {
+        "id": "q32",
+        "page": 13,
+        "label": "32",
+        "section": "incline"
+      },
+      {
+        "id": "q33",
+        "page": 14,
+        "label": "33",
+        "section": "incline"
+      },
+      {
+        "id": "q34",
+        "page": 15,
+        "label": "34",
+        "section": "incline"
+      },
+      {
+        "id": "q35",
+        "page": 16,
+        "label": "35",
+        "section": "incline"
+      }
+    ],
+    "anchors": {},
+    "fixedAnchors": {},
+    "overrides": {
+      "q1": {
+        "region": [
+          66,
+          396.5,
+          546,
+          487.5
+        ]
+      },
+      "q2": {
+        "region": [
+          66,
+          638.5,
+          546,
+          790
+        ]
+      },
+      "q3": {
+        "region": [
+          66,
+          209.5,
+          546,
+          227.0
+        ],
+        "square": [
+          548.2,
+          75.6,
+          575.2,
+          102.6
+        ],
+        "space": 165
+      },
+      "q4": {
+        "region": [
+          66,
+          372.5,
+          546,
+          407.5
+        ],
+        "square": [
+          546.6,
+          321.7,
+          573.5,
+          348.6
+        ],
+        "space": 165
+      },
+      "q5": {
+        "region": [
+          66,
+          494.5,
+          546,
+          585.0
+        ],
+        "square": [
+          548.5,
+          477.9,
+          575.4,
+          504.9
+        ],
+        "space": 30
+      },
+      "q6": {
+        "region": [
+          66,
+          735.5,
+          546,
+          790
+        ],
+        "square": [
+          550.2,
+          590.8,
+          577.2,
+          617.7
+        ],
+        "space": 135
+      },
+      "q7": {
+        "region": [
+          66,
+          182.0,
+          546,
+          191.0
+        ],
+        "square": [
+          554.9,
+          80.5,
+          581.9,
+          107.5
+        ],
+        "space": 150
+      },
+      "q8": {
+        "region": [
+          66,
+          302.0,
+          546,
+          306.0
+        ],
+        "square": [
+          556.7,
+          218.3,
+          583.7,
+          245.3
+        ],
+        "space": 130
+      },
+      "q9": {
+        "region": [
+          66,
+          342.5,
+          355,
+          456.0
+        ],
+        "space": 65
+      },
+      "q10": {
+        "region": [
+          66,
+          624.0,
+          546,
+          657.0
+        ],
+        "space": 205
+      },
+      "q11": {
+        "region": [
+          66,
+          797,
+          546,
+          935
+        ],
+        "space": 81
+      },
+      "q12": {
+        "region": [
+          66,
+          113.5,
+          470,
+          212.0
+        ]
+      },
+      "q13": {
+        "region": [
+          66,
+          365.5,
+          546,
+          380.5
+        ],
+        "space": 130
+      },
+      "q14": {
+        "region": [
+          66,
+          511.0,
+          546,
+          566.0
+        ],
+        "space": 115
+      },
+      "q15": {
+        "region": [
+          66,
+          654.0,
+          345,
+          776.0
+        ],
+        "space": 295
+      },
+      "q16": {
+        "region": [
+          66,
+          328.5,
+          546,
+          449.0
+        ],
+        "space": 80
+      },
+      "q17": {
+        "region": [
+          66,
+          608.5,
+          546,
+          636.5
+        ],
+        "square": [
+          547.2,
+          584.1,
+          574.2,
+          611.0
+        ],
+        "space": 155
+      },
+      "q18": {
+        "region": [
+          66,
+          797,
+          546,
+          1055
+        ],
+        "square": [
+          548.0,
+          732.9,
+          574.9,
+          759.9
+        ],
+        "space": 0
+      },
+      "q19": {
+        "region": [
+          66,
+          180.5,
+          546,
+          229.0
+        ],
+        "square": [
+          550.6,
+          151.3,
+          576.6,
+          174.7
+        ],
+        "space": 146
+      },
+      "q20": {
+        "region": [
+          66,
+          351.5,
+          546,
+          397.0
+        ],
+        "square": [
+          548.9,
+          310.4,
+          575.9,
+          336.3
+        ],
+        "space": 65
+      },
+      "q21": {
+        "region": [
+          66,
+          522.5,
+          546,
+          588.5
+        ],
+        "square": [
+          550.5,
+          475.9,
+          576.5,
+          499.2
+        ],
+        "space": 215
+      },
+      "q22": {
+        "region": [
+          66,
+          732.0,
+          546,
+          790
+        ],
+        "square": [
+          543.9,
+          698.4,
+          572.7,
+          727.2
+        ],
+        "space": 80
+      },
+      "q23": {
+        "region": [
+          66,
+          202.5,
+          546,
+          235.0
+        ],
+        "square": [
+          551.2,
+          159.5,
+          579.8,
+          189.4
+        ],
+        "space": 130
+      },
+      "q24": {
+        "region": [
+          66,
+          360.5,
+          546,
+          388.0
+        ],
+        "square": [
+          550.5,
+          318.8,
+          578.1,
+          347.2
+        ],
+        "space": 235
+      },
+      "q25": {
+        "region": [
+          66,
+          566.5,
+          546,
+          603.0
+        ],
+        "square": [
+          549.4,
+          481.5,
+          578.1,
+          510.3
+        ],
+        "space": 125
+      },
+      "q26": {
+        "region": [
+          66,
+          765.5,
+          546,
+          775.0
+        ],
+        "square": [
+          545.3,
+          777.1,
+          571.2,
+          800.5
+        ],
+        "space": 200
+      },
+      "q27": {
+        "region": [
+          66,
+          282.0,
+          546,
+          399.0
+        ],
+        "space": 365
+      },
+      "q28": {
+        "region": [
+          66,
+          722.5,
+          546,
+          790
+        ],
+        "space": 414
+      },
+      "q29": {
+        "region": [
+          66,
+          244.5,
+          546,
+          790
+        ]
+      },
+      "q30": {
+        "region": [
+          66,
+          287.5,
+          546,
+          790
+        ]
+      },
+      "q31": {
+        "region": [
+          66,
+          256.5,
+          546,
+          790
+        ],
+        "space": 19
+      },
+      "q32": {
+        "region": [
+          66,
+          582.5,
+          546,
+          790
+        ],
+        "space": 517
+      },
+      "q33": {
+        "region": [
+          66,
+          361.0,
+          546,
+          790
+        ],
+        "space": 64
+      },
+      "q34": {
+        "region": [
+          66,
+          327.5,
+          546,
+          790
+        ]
+      },
+      "q35": {
+        "region": [
+          66,
+          733.0,
+          546,
+          790
+        ],
+        "space": 819
+      }
+    }
+  }
+}
