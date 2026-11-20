@@ -686,13 +686,21 @@ body.tools-collapsed #tools-collapse { opacity: 1; }
 .g-option.on { background: #e00000; border-color: #e00000; color: #fff; }
 .g-verdict { margin: 4px 0 0; font-weight: 700; color: var(--ink); min-height: 1.2em; }
 .g-svg { display: block; width: 100%; height: auto; background: #fbf8f2; border: 1px solid #ece4d6; border-radius: 12px; margin: 6px 0 10px; font-family: var(--font-ui); }
-.g-slider { display: flex; align-items: center; gap: 8px; margin: 8px 0; padding: 6px 10px; background: #f4f1ea; border-radius: 12px; }
+.g-slider { display: flex; align-items: center; gap: 8px; margin: 8px 0; padding: 6px 10px; background: #f4f1ea; border-radius: 12px; flex-wrap: wrap; }
 .g-lab { min-width: 120px; font-size: var(--fs-sm); font-weight: 600; color: #2c3a55; }
 .g-slider input[type="range"] { flex: 1; min-width: 80px; height: 40px; accent-color: var(--ink); touch-action: none; }
 .g-slider output { min-width: 48px; text-align: right; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
 .g-nudge { width: 36px; min-width: 36px; height: 36px; min-height: 36px; padding: 0; font-size: 20px; border: 1px solid #d5d9e2; }
 .g-play { width: 40px; min-width: 40px; height: 36px; min-height: 36px; padding: 0; background: var(--ink); color: #fff; }
 .g-read { margin: 10px 0; padding: 10px 12px; border-radius: 12px; background: #fff; border: 1px solid #e4dccd; }
+/* A phone is 358 px of drawer width: label + range + output + two nudges + play needs 360 px, so it
+   used to overflow by 16 px at a 390 px viewport (measured 2026-11-20). The label takes a row of its
+   own and the range keeps 80 px, so − / range / + / output / ▶ share the second row: measured 81 px
+   per slider, against 169 px when the range was forced onto a row of its own. */
+@media (max-width: 460px) {
+  .g-lab { flex: 1 1 100%; min-width: 0; }
+  .g-slider input[type="range"] { flex: 1 1 80px; }
+}
 .g-read-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .g-expr { flex: 1; overflow-x: auto; min-width: 0; }
 .g-expr .katex-display { margin: 0.2em 0; text-align: left; }
@@ -846,13 +854,21 @@ body.present .toolbar.dock-bottom { bottom: calc(76px + env(safe-area-inset-bott
   .drawer {
     top: auto;
     width: 100%;
-    height: 62vh;
+    /* As tall as its content, up to 92% of the screen. A fixed 62vh cut the bottom of a tall widget
+       off: phy11 Q6 is 897 px of drawer body and the ✓/✗ statements sat 135 px below the fold on an
+       iPad Pro 11 portrait, 213 px on an iPad mini and 550 px on a phone (measured 2026-11-20). At
+       92% the three portrait iPads show the whole widget (drawer 959 / 953 / 932 px, scroll 0). */
+    height: auto;
+    max-height: 92vh;
+    max-height: 92dvh;
     border-right: 0;
     border-top: 1px solid var(--line);
     border-radius: 18px 18px 0 0;
     transform: translateY(104%);
   }
   .drawer.open { transform: none; }
+  /* flex-basis auto, so the body takes its content's height and only scrolls once the 92% cap hits. */
+  .drawer-body { flex: 1 1 auto; min-height: 0; }
   .g-lab { min-width: 80px; }
 }
 
