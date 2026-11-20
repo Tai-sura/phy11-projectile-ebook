@@ -122,7 +122,8 @@ function q14(root) {
 /* ---------- Q6: dropping and projecting, side by side ---------- */
 
 function q6(root) {
-  const W = 660, HT = 250, G = 9.81, HM = 5;           // 5 m drop, same for both
+  const W = 660, HT = 270, G = 9.81, HM = 5;           // 5 m drop, same for both; 270 leaves
+                                                        // room for the v_y arrow below the ground
   const TF = Math.sqrt((2 * HM) / G);                  // time to fall 5 m
   const TMAX = Math.ceil(TF * 100) / 100;              // a slider max the step can reach
   const SC = 30;                                       // px per metre, both axes
@@ -240,23 +241,24 @@ function q6(root) {
     // the live pair: the green line is level by construction, it reads pP.y
     S("line", { x1: pP.x, y1: pP.y, x2: pQ.x, y2: pP.y, stroke: C.green, "stroke-width": 2, "stroke-dasharray": "6 4" }, svg);
     S("circle", { cx: pP.x, cy: pP.y, r: 9, fill: C.redSoft, stroke: C.red, "stroke-width": 2 }, svg);
-    T(svg, pP.x, pP.y + 4, "P", { fill: C.ink, "font-size": 12, "font-weight": 700, "text-anchor": "middle" });
     S("circle", { cx: pQ.x, cy: pQ.y, r: 9, fill: C.blueSoft, stroke: C.blue, "stroke-width": 2 }, svg);
-    T(svg, pQ.x, pQ.y + 4, "Q", { fill: C.ink, "font-size": 12, "font-weight": 700, "text-anchor": "middle" });
 
-    // The same downward velocity on both balls, from the same vy: one length, drawn above each
-    // ball so it never crosses the ground at the end (and clear of P's column of footprints,
-    // which sit on the ball's own x: the two cross, they do not merge).
+    // The same downward velocity on both balls, from the same vy: one length for both, drawn
+    // straight down from each ball's centre (the vector acts at the centre of mass, so its tail
+    // is the centre, not the top of the ball). Drawn before the letters so the P/Q stay clean.
     const vlen = vy * 4.2;
-    if (vlen > 3.5) {
-      const down = (x, yb, color) => {
-        const tip = yb - 11, tail = tip - vlen, head = Math.min(6, vlen - 1);
-        S("line", { x1: x, y1: tail, x2: x, y2: tip - head + 1, stroke: color, "stroke-width": 1.8 }, svg);
+    if (vlen > 3) {
+      const down = (x, yc, color) => {
+        const tip = yc + vlen, head = Math.min(6, vlen - 1);
+        S("line", { x1: x, y1: yc, x2: x, y2: tip - head, stroke: color, "stroke-width": 2 }, svg);
         S("polygon", { points: `${x},${tip} ${x - 4},${tip - head} ${x + 4},${tip - head}`, fill: color }, svg);
       };
       down(pP.x, pP.y, C.red);
       down(pQ.x, pQ.y, C.blue);
     }
+
+    T(svg, pP.x, pP.y + 4, "P", { fill: C.ink, "font-size": 12, "font-weight": 700, "text-anchor": "middle" });
+    T(svg, pQ.x, pQ.y + 4, "Q", { fill: C.ink, "font-size": 12, "font-weight": 700, "text-anchor": "middle" });
 
     if (u > 0) {
       const x1 = pQ.x + 12, x2 = Math.min(x1 + Math.min(u * 5, 70), W - 8);
