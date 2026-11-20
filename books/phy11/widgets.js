@@ -153,10 +153,25 @@ function q6(root) {
   // It plays from wherever the slider stands (and starts again after the ground).
   const playBtn = H("button", {
     type: "button",
-    style: "margin:2px 0 8px;padding:8px 16px;border-radius:10px;border:1px solid #1d8a4a;" +
+    style: "padding:8px 16px;border-radius:10px;border:1px solid #1d8a4a;" +
       "background:#e3f5e9;color:#12703a;font:700 14px ui-sans-serif,system-ui;cursor:pointer",
   }, ["▶ 自動播放時間"]);
-  const pbar = H("div", {}, [playBtn]);
+
+  // The two dashed paths can be switched off, so the class can predict where each ball goes
+  // before the guides are shown; the footprints and labels stay so the time slider still reads.
+  let showPaths = true;
+  const pathBtn = H("button", {
+    type: "button",
+    style: "padding:8px 14px;border-radius:10px;border:1px solid #c9cfda;" +
+      "background:#f6f7fa;color:#26313d;font:700 14px ui-sans-serif,system-ui;cursor:pointer",
+  }, ["隱藏軌跡"]);
+  pathBtn.addEventListener("click", () => {
+    showPaths = !showPaths;
+    pathBtn.textContent = showPaths ? "隱藏軌跡" : "顯示軌跡";
+    draw();
+  });
+
+  const pbar = H("div", { style: "display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 8px" }, [playBtn, pathBtn]);
   let raf = 0, auto = false;
   const stopPlay = () => {
     if (raf) cancelAnimationFrame(raf);
@@ -220,16 +235,18 @@ function q6(root) {
     T(svg, 64, GROUND + 16, "ground", { fill: C.grey, "font-size": 12 });
 
     // the two paths, each in its own colour and dashed: P straight down, Q the parabola. Drawn
-    // before the footprints so the 0.2 s circles stay whole on top of them.
-    S("line", { x1: XP, y1: Y0, x2: XP, y2: GROUND, stroke: C.red, "stroke-width": 1.6,
-      "stroke-dasharray": "5 5", opacity: 0.55 }, svg);
-    const qpath = [];
-    for (let i = 0; i <= 48; i++) {
-      const tk = (i / 48) * TF;
-      qpath.push(`${(XQ + u * tk * SC).toFixed(1)},${(Y0 + 0.5 * G * tk * tk * SC).toFixed(1)}`);
+    // before the footprints so the 0.2 s circles stay whole on top of them; the button hides them.
+    if (showPaths) {
+      S("line", { x1: XP, y1: Y0, x2: XP, y2: GROUND, stroke: C.red, "stroke-width": 1.6,
+        "stroke-dasharray": "5 5", opacity: 0.55 }, svg);
+      const qpath = [];
+      for (let i = 0; i <= 48; i++) {
+        const tk = (i / 48) * TF;
+        qpath.push(`${(XQ + u * tk * SC).toFixed(1)},${(Y0 + 0.5 * G * tk * tk * SC).toFixed(1)}`);
+      }
+      S("polyline", { points: qpath.join(" "), fill: "none", stroke: C.blue, "stroke-width": 1.6,
+        "stroke-dasharray": "5 5", opacity: 0.55 }, svg);
     }
-    S("polyline", { points: qpath.join(" "), fill: "none", stroke: C.blue, "stroke-width": 1.6,
-      "stroke-dasharray": "5 5", opacity: 0.55 }, svg);
 
     // the stroboscope: one pair of footprints for every 0.2 s the time has gone past.
     // The pair shares one y, and the +Δy on P's column is the step between two of them.
