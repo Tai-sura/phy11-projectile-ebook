@@ -631,6 +631,145 @@ function q36(root) {
   render();
 }
 
+/* ---------------- Q19: one switch, two equivalent resistances ----------------
+ *
+ * q19 prints a 12 V battery feeding R1 = 3 ohm, after which the rail B feeds three vertical
+ * branches: R2 = 3 ohm through the switch S, and R3 = 3 ohm and R4 = 3 ohm straight to the
+ * bottom rail. The printed answers are
+ *     (a) S open:   R3 || R4 = 1.5, R_AD = 3 + 1.5 = 4.5 ohm
+ *     (b) S closed: R2 || (R3 || R4) = 1, R_AD = 3 + 1 = 4 ohm
+ *     (c) I = 12/4 = 3 A, V_R1 = 3 x 3 = 9 V
+ *     (d) C and D are on the same bottom wire, so V_AC = V_AD = 12 V
+ * The widget is the printed circuit with the switch as the only control — a switch, not a
+ * slider — and every number is recomputed from the printed 12 V and 3, 3, 3 ohms.
+ */
+const Q19_V = 12;        // V, printed
+const Q19_R1 = 3;        // ohm, printed
+const Q19_R2 = 3;        // ohm, printed (through S)
+const Q19_R3 = 3;        // ohm, printed
+const Q19_R4 = 3;        // ohm, printed
+
+function q19(root) {
+  const CW = 560, CH = 310;
+  const svg = scene(CW, CH);
+  const r = readout();
+  const state = { closed: false };
+
+  const swBtn = buttonRow([["close S", () => { state.closed = !state.closed; render(); }]]);
+  const swLabel = () => (state.closed ? "open S" : "close S");
+
+  root.append(
+    question("A 12 V battery feeds a network: R1 = 3 \u03A9, then three branches \u2014 R2 = 3 \u03A9 behind the switch S, and R3 = 3 \u03A9, R4 = 3 \u03A9. Find R_AD with S open and closed, then the current and the p.d. across R1.", [
+      "S open: only $R_3 \\parallel R_4$ hangs from B",
+      "S closed: $R_2$ is in parallel with that pair",
+      "Series part adds on: $R_{AD} = R_1 + R_{\\text{parallel}}$",
+    ]),
+    svg,
+    swBtn,
+    r.el,
+  );
+
+  const render = () => {
+    clear(svg);
+    const closed = state.closed;
+    const r34 = 1 / (1 / Q19_R3 + 1 / Q19_R4);          // 1.5 ohm
+    const rp = closed ? 1 / (1 / Q19_R2 + 1 / r34) : r34; // 1 or 1.5 ohm
+    const rad = Q19_R1 + rp;
+    const I = Q19_V / rad;
+    const vR1 = I * Q19_R1;
+    const vAC = Q19_V;                                   // C sits on D's wire
+
+    const wire = (pts, color, w) => S("path", {
+      d: pts.map((p, i) => (i ? "L" : "M") + p[0] + " " + p[1]).join(" "),
+      fill: "none", stroke: color || C.line, "stroke-width": w || 2, "stroke-linejoin": "round",
+    }, svg);
+    const resV = (cx, cy, h, label) => {
+      S("rect", { x: cx - 8, y: cy - h / 2, width: 16, height: h, fill: C.paper, stroke: C.line, "stroke-width": 2 }, svg);
+      T(svg, cx - 14, cy + 4, label, { "text-anchor": "end", "font-size": 11.5, "font-weight": 700, fill: C.ink });
+    };
+    const node = (x, y) => S("circle", { cx: x, cy: y, r: 3.6, fill: C.line }, svg);
+    const contact = (x, y) => S("circle", { cx: x, cy: y, r: 3.4, fill: C.paper, stroke: C.line, "stroke-width": 1.8 }, svg);
+
+    const TOP = 88, BOT = 252, BAT = 52, AX = 100, SX = 240, R3X = 340, R4X = 430;
+
+    /* ---- the battery, printed as a two-cell source ---- */
+    wire([[BAT, TOP], [BAT, 162]]);
+    wire([[BAT, 192], [BAT, BOT]]);
+    S("line", { x1: BAT - 13, y1: 162, x2: BAT + 13, y2: 162, stroke: C.line, "stroke-width": 3 }, svg);
+    S("line", { x1: BAT - 7, y1: 171, x2: BAT + 7, y2: 171, stroke: C.line, "stroke-width": 3 }, svg);
+    S("line", { x1: BAT - 13, y1: 180, x2: BAT + 13, y2: 180, stroke: C.line, "stroke-width": 3 }, svg);
+    S("line", { x1: BAT - 7, y1: 190, x2: BAT + 7, y2: 190, stroke: C.line, "stroke-width": 3 }, svg);
+    T(svg, BAT - 22, 181, "12 V", { "text-anchor": "end", "font-size": 12.5, "font-weight": 700, fill: C.ink });
+
+    /* ---- the rails ---- */
+    wire([[BAT, TOP], [SX, TOP], [R4X, TOP]]);
+    wire([[BAT, BOT], [R4X, BOT]]);
+
+    /* ---- R1 on the top rail, between A and B ---- */
+    wire([[AX, TOP], [133, TOP]]);
+    S("rect", { x: 133, y: TOP - 8, width: 70, height: 16, fill: C.paper, stroke: C.line, "stroke-width": 2 }, svg);
+    wire([[203, TOP], [SX, TOP]]);
+    T(svg, 168, TOP - 14, "R\u2081", { "text-anchor": "middle", "font-size": 12, "font-weight": 700, fill: C.ink });
+
+    /* ---- the switch S: pivot on the rail, blade down-right when open ---- */
+    wire([[SX, TOP], [SX, 113]]);
+    contact(SX, 116);
+    if (closed) {
+      S("line", { x1: SX, y1: 116, x2: SX, y2: 145, stroke: C.green, "stroke-width": 2.6 }, svg);
+    } else {
+      S("line", { x1: SX, y1: 116, x2: SX + 17, y2: 143, stroke: C.line, "stroke-width": 2.6 }, svg);
+    }
+    contact(SX, 148);
+    wire([[SX, 151], [SX, 165]]);
+    T(svg, SX + 8, 132, "S", { "font-size": 12.5, "font-weight": 700, fill: closed ? C.green : C.line });
+
+    /* ---- R2, R3, R4 down to the bottom rail ---- */
+    resV(SX, 192, 54, "R\u2082");
+    wire([[SX, 219], [SX, BOT]]);
+    resV(R3X, 192, 54, "R\u2083");
+    wire([[R3X, TOP], [R3X, 165]]);
+    wire([[R3X, 219], [R3X, BOT]]);
+    resV(R4X, 192, 54, "R\u2084");
+    wire([[R4X, TOP], [R4X, 165]]);
+    wire([[R4X, 219], [R4X, BOT]]);
+
+    /* ---- the marked points, as printed ---- */
+    node(AX, TOP);
+    node(300, TOP);
+    node(295, BOT);
+    node(AX, BOT);
+    T(svg, AX, TOP - 16, "A", { "text-anchor": "middle", "font-size": 13, "font-weight": 700, fill: C.ink });
+    T(svg, 300, TOP - 16, "B", { "text-anchor": "middle", "font-size": 13, "font-weight": 700, fill: C.ink });
+    T(svg, 295, BOT + 18, "C", { "text-anchor": "middle", "font-size": 13, "font-weight": 700, fill: C.ink });
+    T(svg, AX, BOT + 18, "D", { "text-anchor": "middle", "font-size": 13, "font-weight": 700, fill: C.ink });
+
+    /* ---- the fixed reading column ---- */
+    const CX = 505;
+    const col = (y, s, color, size) =>
+      T(svg, CX, y, s, { "text-anchor": "middle", "font-size": size, "font-weight": 700, fill: color });
+    col(70, closed ? "S = closed" : "S = open", closed ? C.green : C.grey, 13);
+    col(110, "R_AD = " + rad.toFixed(1) + " \u03A9", C.blue, 15);
+    col(146, "I = " + I.toFixed(2) + " A", C.red, 13);
+    col(180, "V_R1 = " + vR1.toFixed(1) + " V", C.blue, 12.5);
+    col(214, "V_AC = " + vAC.toFixed(1) + " V", C.amber, 12.5);
+    col(248, closed ? "R\u2082 \u2225 (R\u2083\u2225R\u2084) = 1" : "R\u2083\u2225R\u2084 = 1.5", C.grey, 11);
+
+    /* ---- the reading row ---- */
+    const latex = "R_{AD} = 3 + " + rp.toFixed(1) + " = " + rad.toFixed(1) + "\\ \\Omega,\\quad I = \\frac{12}{" +
+      rad.toFixed(1) + "} = " + I.toFixed(2) + "\\ \\text{A},\\quad V_{R1} = " + vR1.toFixed(1) + "\\ \\text{V}";
+    const caption = closed
+      ? "S closed: R\u2082 = 3 \u03A9 is in parallel with R\u2083 \u2225 R\u2084 = 1.5 \u03A9, so that part is 1 \u03A9. R_AD = 3 + 1 = 4 \u03A9, I = 12/4 = 3.00 A and V_R1 = 3 \u00D7 3 = 9.0 V. C is on D's wire, so V_AC = 12 V."
+      : "S open: R\u2082 is cut off, so only R\u2083 \u2225 R\u2084 = 1.5 \u03A9 hangs from B. R_AD = 3 + 1.5 = 4.5 \u03A9, I = 12/4.5 = 2.67 A and V_R1 = 2.67 \u00D7 3 = 8.0 V. C is on D's wire, so V_AC = 12 V.";
+    r.set(latex, true, caption, { yes: closed ? "S closed" : "S open" });
+
+    // the toggle button's label follows the state
+    const btn = swBtn.querySelector("button");
+    if (btn) btn.textContent = swLabel();
+  };
+
+  render();
+}
+
 /* ---------------- Q16: the same two resistors, in series and in parallel ----------------
  *
  * q16 gives 3 ohm, 6 ohm and a 9 V battery, and its answers are
@@ -765,7 +904,7 @@ function q16(root) {
   render();
 }
 
-const REGISTRY = { q2, q3, q6, q9, q36, q16 };
+const REGISTRY = { q2, q3, q6, q9, q19, q36, q16 };
 
 export function hasGraphic(id) {
   return Boolean(REGISTRY[id]);
