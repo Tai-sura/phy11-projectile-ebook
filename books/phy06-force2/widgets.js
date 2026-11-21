@@ -171,7 +171,7 @@ const K35 = (v) => {
 function q35(root) {
   const CW = 620, CH = 330;
   const svg = scene(CW, CH);
-  const thS = slider({ label: "θ (degrees)", min: 0, max: 60, step: 0.1, value: 22.5, fmt: (v) => `${v}°`, play: false });
+  const thS = slider({ label: "θ (degrees)", min: 0, max: 75, step: 0.1, value: 22.5, fmt: (v) => `${v}°`, play: false });
   const mS = slider({ label: "m_X (kg)", min: 1, max: 10, step: 0.5, value: 5, play: false });
   const r = readout();
   const state = { mode: 0 };
@@ -254,7 +254,7 @@ function q35(root) {
     const side = 18 * Math.cbrt(m / 5);
     const hX = side / 2;
     const dx = Math.cos(rad), dy = -Math.sin(rad), nx = -Math.sin(rad), ny = -Math.cos(rad);
-    const px = BX + 0.55 * L * ux, py = BY + 0.55 * L * uy;
+    const px = BX + 0.45 * L * ux, py = BY + 0.45 * L * uy;
     const cx = px + nx * hX, cy = py + ny * hX;
     const corner = (a, b) => [cx + dx * a + nx * b, cy + dy * a + ny * b];
     const pts = [corner(-hX, -hX), corner(hX, -hX), corner(hX, hX), corner(-hX, hX)];
@@ -281,15 +281,18 @@ function q35(root) {
       // (s/2, 0), so it is the centre offset by hX along the plane, NOT the bbox edge.
       // It ends on the pulley's rim, on the line from the pulley centre to that point.
       const attX = cx + dx * hX, attY = cy + dy * hX;
-      const pulX = tipX + 16, pulY = Math.min(tipY, BY - 40) - 12;
+      // the pulley sits a fixed step off the apex along the normal, so it stays just
+      // above the top of the plane at every angle; Y hangs a fixed drop below it
+      const pulX = tipX + nx * 18, pulY = tipY + ny * 18;
       const rdx = attX - pulX, rdy = attY - pulY;
       const rl = Math.hypot(rdx, rdy) || 1;
       S("line", { x1: attX, y1: attY, x2: pulX + (rdx / rl) * 6, y2: pulY + (rdy / rl) * 6,
         stroke: C.line, "stroke-width": 1.6 }, svg);
       S("circle", { cx: pulX, cy: pulY, r: 6, fill: "#fff", stroke: C.line, "stroke-width": 2 }, svg);
-      S("line", { x1: pulX, y1: pulY + 6, x2: pulX, y2: BY - 34, stroke: C.line, "stroke-width": 1.6 }, svg);
-      S("rect", { x: pulX - 15, y: BY - 34, width: 30, height: 24, fill: C.amberSoft, stroke: C.amber, "stroke-width": 2 }, svg);
-      T(svg, pulX, BY - 18, "Y", { "text-anchor": "middle", "font-size": 11, "font-weight": 700, fill: C.amber });
+      const yTop = pulY + 30;
+      S("line", { x1: pulX, y1: pulY + 6, x2: pulX, y2: yTop, stroke: C.line, "stroke-width": 1.6 }, svg);
+      S("rect", { x: pulX - 15, y: yTop, width: 30, height: 24, fill: C.amberSoft, stroke: C.amber, "stroke-width": 2 }, svg);
+      T(svg, pulX, yTop + 16, "Y", { "text-anchor": "middle", "font-size": 11, "font-weight": 700, fill: C.amber });
     }
 
     /* ---- the fixed readout row ---- */
