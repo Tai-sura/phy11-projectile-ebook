@@ -938,16 +938,42 @@
   },
   "media": [
     {
+      "page": 1,
+      "region": [
+        330,
+        112,
+        580,
+        247
+      ],
+      "scene": "spem02:Current",
+      "src": "media/current-panel-3.mp4",
+      "poster": "media/current-panel-3-poster.png",
+      "title": "Charge flows: 1 C per second is 1 A"
+    },
+    {
+      "page": 1,
+      "region": [
+        345,
+        492,
+        578,
+        717
+      ],
+      "scene": "spem02:Voltage",
+      "src": "media/voltage-panel-4.mp4",
+      "poster": "media/voltage-panel-4-poster.png",
+      "title": "4 J given, 1 J and 3 J spent: V = E/Q"
+    },
+    {
       "page": 5,
       "region": [
         24,
         104,
         578,
-        266
+        264.5
       ],
       "scene": "spem02:ResistorNetwork",
-      "src": "media/resistor-network.mp4",
-      "poster": "media/resistor-network.jpg",
+      "src": "media/resistor-network-3.mp4",
+      "poster": "media/resistor-network-3.jpg",
       "title": "Series, then parallel: same I, same V"
     },
     {
