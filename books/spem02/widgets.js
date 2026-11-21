@@ -3,7 +3,127 @@
  * Build them from the shared kit; house rules are in docs/03-authoring-style.md.
  */
 
-import { C, S, T, scene, clear, readout, question, tabs } from "../../engine/widgets/kit.js";
+import { C, S, T, scene, clear, readout, question, tabs, slider } from "../../engine/widgets/kit.js";
+
+/* ---------------- Q2: charge = current x time, and the mA h rating ----------------
+ *
+ * q2 prints a 1800 mA h battery driving a toy train that draws 0.4 A, and works
+ *     1800 mA h = 1.8 A h,   time = Q / I = 1.8 / 0.4 = 4.5 h
+ * The widget starts on exactly those two printed numbers and recomputes Q = I t whenever
+ * the reader moves a slider. The ray from the origin IS Q = I t (its slope is the current),
+ * the dashed horizontal line is the charge the battery really holds (1800 mA h — the
+ * question gives no other capacity), so the crossing of the two is how long the train runs.
+ *
+ * Axes are fixed (t 0..9 h, Q 0..6000 mA h) so two different currents can be compared
+ * directly. With I in 0.20..0.60 A and t in 0.5..9 h every reading stays inside the frame:
+ * Q <= 0.60 x 9 = 5400 mA h, and the crossing is at 1800/I >= 3 h and <= 9 h.
+ */
+const Q2_CAP = 1800;    // mA h, the rating q2 gives; also the charge the battery holds
+const Q2_I0 = 0.4;      // A, the current q2 gives
+const Q2_T0 = 4.5;      // h, the time q2 answers
+
+function q2(root) {
+  const CW = 560, CH = 240;
+  const svg = scene(CW, CH);
+  const iS = slider({ label: "current I (A)", min: 0.2, max: 0.6, step: 0.05, value: Q2_I0,
+    fmt: (v) => v.toFixed(2) + " A", play: false });
+  const tS = slider({ label: "time t (h)", min: 0.5, max: 9, step: 0.1, value: Q2_T0,
+    fmt: (v) => v.toFixed(1) + " h", play: false });
+  const r = readout();
+
+  root.append(
+    question("A 1800 mA h battery drives a toy train that draws 0.4 A. At most, how long can the train run?", [
+      "Charge, current and time: $Q = It$",
+      "A mA h is a charge: $1\\ \\text{A h} = 3600\\ \\text{C}$",
+      "So the running time is $t = Q/I$",
+    ]),
+    svg,
+    iS.el, tS.el, r.el,
+  );
+
+  // fixed plot frame: t 0..9 h across, Q 0..6000 mA h up
+  const X0 = 74, X1 = 470, Y0 = 40, Y1 = 200;
+  const TMAX = 9, QMAX = 6000;
+  const TX = (t) => X0 + (t / TMAX) * (X1 - X0);
+  const QY = (q) => Y1 - (q / QMAX) * (Y1 - Y0);
+
+  const render = () => {
+    clear(svg);
+    const I = iS.get(), t = tS.get();
+    const q = I * 1000 * t;              // mA h delivered in that time
+    const qC = I * t * 3600;             // the same charge in coulombs
+    const tLife = Q2_CAP / (I * 1000);   // h, how long the battery actually lasts
+
+    /* ---- fixed axes ---- */
+    S("line", { x1: X0, y1: Y1, x2: X1 + 10, y2: Y1, stroke: C.line, "stroke-width": 1.6 }, svg);
+    S("line", { x1: X0, y1: Y1, x2: X0, y2: Y0 - 12, stroke: C.line, "stroke-width": 1.6 }, svg);
+    for (let h = 0; h <= TMAX; h++) {
+      S("line", { x1: TX(h), y1: Y1, x2: TX(h), y2: Y1 + 5, stroke: C.line, "stroke-width": 1 }, svg);
+      T(svg, TX(h), Y1 + 18, String(h), { "text-anchor": "middle", "font-size": 11, fill: "#444" });
+    }
+    for (let m = 0; m <= QMAX; m += 1000) {
+      S("line", { x1: X0 - 4, y1: QY(m), x2: X0, y2: QY(m), stroke: C.line, "stroke-width": 1 }, svg);
+      T(svg, X0 - 8, QY(m) + 4, String(m), { "text-anchor": "end", "font-size": 10.5, fill: "#444" });
+    }
+    T(svg, X1, Y1 + 32, "t (h)", { "text-anchor": "end", "font-size": 12, fill: C.line });
+    T(svg, X0 - 8, Y0 - 18, "Q (mA h)", { "text-anchor": "start", "font-size": 12, fill: C.line });
+
+    /* ---- what the battery holds (fixed: the question gives 1800 mA h) ---- */
+    const capY = QY(Q2_CAP);
+    S("line", { x1: X0, y1: capY, x2: X1, y2: capY, stroke: C.amber, "stroke-width": 1.8,
+      "stroke-dasharray": "7 5" }, svg);
+    // label above the line at its left end: the ray is far below there, and the crossing
+    // label lives on the other side near the right, so the two can never meet
+    T(svg, X0 + 4, capY - 8, "battery: 1800 mA h",
+      { "font-size": 11, "font-weight": 700, fill: C.amber });
+
+    /* ---- the live Q = I t ray, solid while the battery lasts ---- */
+    const tEnd = Math.min(TMAX, tLife);
+    S("line", { x1: TX(0), y1: QY(0), x2: TX(tEnd), y2: QY(I * 1000 * tEnd),
+      stroke: C.blue, "stroke-width": 2.6 }, svg);
+    if (tLife < TMAX) {
+      S("line", { x1: TX(tEnd), y1: QY(I * 1000 * tEnd), x2: TX(TMAX), y2: QY(I * 1000 * TMAX),
+        stroke: C.grey, "stroke-width": 1.8, "stroke-dasharray": "5 4" }, svg);
+    }
+    // the slope label sits 45% of the way along the run, which is always the same height
+    // (45% of the 1800 mA h the battery holds = 810 mA h), and just BELOW the ray, the empty
+    // side; above the ray it would be crossed by the ray itself at the steeper currents
+    const rl = tEnd * 0.45;
+    T(svg, TX(rl) + 4, QY(I * 1000 * rl) + 15, "I = " + I.toFixed(2) + " A",
+      { "text-anchor": "start", "font-size": 11.5, "font-weight": 700, fill: C.blue });
+
+    /* ---- where the ray meets the capacity line: the running time ----
+     * below-right of the crossing is always empty (past the crossing the ray is above the
+     * line); near the right edge the label flips to the empty side above-left. */
+    const runX = TX(tEnd);
+    S("circle", { cx: runX, cy: capY, r: 4, fill: C.amber, stroke: C.amber, "stroke-width": 1 }, svg);
+    const flip = runX > 452;
+    T(svg, flip ? runX - 8 : runX + 8, flip ? capY - 9 : capY + 18, "runs " + tLife.toFixed(2) + " h",
+      { "text-anchor": flip ? "end" : "start", "font-size": 11, "font-weight": 700, fill: C.amber });
+
+    /* ---- the live charge, in a fixed corner of the plot that nothing else reaches ---- */
+    T(svg, X0 + 6, Y0 + 17, "Q = " + Math.round(q) + " mA h",
+      { "font-size": 12.5, "font-weight": 700, fill: C.blue });
+
+    /* ---- the point the two sliders choose ---- */
+    S("circle", { cx: TX(t), cy: QY(q), r: 5.5, fill: "#fff", stroke: C.blue, "stroke-width": 2.4 }, svg);
+
+    /* ---- the reading row ---- */
+    const f0 = (v) => String(Math.round(v));
+    const latex = "Q = It = " + I.toFixed(2) + "\\ \\text{A}\\times " + t.toFixed(2) +
+      "\\ \\text{h} = " + f0(q) + "\\ \\text{mA h} = " + f0(qC) + "\\ \\text{C}";
+    const over = q > Q2_CAP + 1e-9;
+    const caption = over
+      ? "That is more charge than the battery holds: 1800 mA h at " + I.toFixed(2) +
+        " A only lasts " + tLife.toFixed(2) + " h."
+      : "1800 mA h = 1.8 A h = " + f0(1800 * 3.6) + " C. At " + I.toFixed(2) + " A the train runs " +
+        tLife.toFixed(2) + " h, because t = Q/I = 1.8/" + I.toFixed(2) + ".";
+    r.set(latex, !over, caption, { yes: "live readings", no: "beyond the battery" });
+  };
+
+  [iS, tS].forEach((s) => s.on(render));
+  render();
+}
 
 /* ---------------- Q16: the same two resistors, in series and in parallel ----------------
  *
@@ -139,7 +259,7 @@ function q16(root) {
   render();
 }
 
-const REGISTRY = { q16 };
+const REGISTRY = { q2, q16 };
 
 export function hasGraphic(id) {
   return Boolean(REGISTRY[id]);
