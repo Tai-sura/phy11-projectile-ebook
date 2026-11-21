@@ -975,9 +975,22 @@
         264.5
       ],
       "scene": "spem02:ResistorNetwork",
-      "src": "media/resistor-network-4.mp4",
-      "poster": "media/resistor-network-4.jpg",
+      "src": "media/resistor-network-5.mp4",
+      "poster": "media/resistor-network-5.jpg",
       "title": "Series, then parallel: same I, same V"
+    },
+    {
+      "page": 14,
+      "region": [
+        68.3,
+        220,
+        548.3,
+        324.7
+      ],
+      "scene": "spem02:Rheostat",
+      "src": "media/rheostat-panel-1.mp4",
+      "poster": "media/rheostat-panel-1-poster.png",
+      "title": "Slide the contact: more wire, more resistance"
     },
     {
       "page": 18,
