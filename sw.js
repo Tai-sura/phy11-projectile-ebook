@@ -1,5 +1,5 @@
 // Bump on every release so iPads drop the old copy (docs/04-qa-and-release.md).
-const CACHE = "ebooks-v106";
+const CACHE = "ebooks-v107";
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();

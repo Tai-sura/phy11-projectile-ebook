@@ -628,6 +628,19 @@
       "src": "media/q31-com-2.mp4",
       "poster": "media/q31-com-2-poster.png",
       "title": "Hang it twice: the two plumb lines cross at the centre of mass"
+    },
+    {
+      "page": 10,
+      "region": [
+        380,
+        605,
+        580,
+        715
+      ],
+      "scene": "jpfm08:LeverArm",
+      "src": "media/q25-lever-2.mp4",
+      "poster": "media/q25-lever-2-poster.png",
+      "title": "F1L1 = F2L2: with L1 < L2 the hand must push harder than the jaw"
     }
   ]
 }
