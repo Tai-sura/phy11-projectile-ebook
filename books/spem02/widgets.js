@@ -125,6 +125,100 @@ function q2(root) {
   render();
 }
 
+/* ---------------- Q3: potential difference = energy per unit charge ----------------
+ *
+ * q3 prints a 3 V battery that has delivered 12 J to a bulb and asks for the charge:
+ *     V = E/Q  ->  Q = E/V = 12/3 = 4 C
+ * The widget starts on those two printed numbers. The ray from the origin is every (Q, E)
+ * pair the chosen battery can be at — its slope IS the potential difference, in joules per
+ * coulomb, which is what makes 1 V = 1 J/C. The short amber bar at Q = 1 C is that slope
+ * read off at one coulomb, so the unit identity is visible, not just stated.
+ *
+ * Axes are fixed (Q 0..12 C, E 0..18 J) and the slider ranges keep every reading inside
+ * them: E <= 18 J always, and Q = E/V <= 18/1.5 = 12 C at the shallowest battery.
+ */
+const Q3_V0 = 3;     // V, the battery q3 gives
+const Q3_E0 = 12;    // J, the energy q3 gives
+
+function q3(root) {
+  const CW = 560, CH = 240;
+  const svg = scene(CW, CH);
+  const vS = slider({ label: "battery V (V)", min: 1.5, max: 6, step: 0.5, value: Q3_V0,
+    fmt: (v) => v.toFixed(1) + " V", play: false });
+  const eS = slider({ label: "energy E (J)", min: 2, max: 18, step: 1, value: Q3_E0,
+    fmt: (v) => v.toFixed(0) + " J", play: false });
+  const r = readout();
+
+  root.append(
+    question("A light bulb is connected to a 3-V battery. If the battery has delivered 12 J of energy to the bulb, how much charge has passed through it?", [
+      "Potential difference is the energy per unit charge: $V = E/Q$",
+      "So the charge that flowed is $Q = E/V$",
+      "$1\\ \\text{V} = 1\\ \\text{J C}^{-1}$",
+    ]),
+    svg,
+    vS.el, eS.el, r.el,
+  );
+
+  // fixed plot frame: Q 0..12 C across, E 0..18 J up; the reading column sits clear of it
+  const X0 = 74, X1 = 436, Y0 = 40, Y1 = 200, CX = 500;
+  const QMAX = 12, EMAX = 18;
+  const TX = (q) => X0 + (q / QMAX) * (X1 - X0);
+  const QY = (e) => Y1 - (e / EMAX) * (Y1 - Y0);
+
+  const render = () => {
+    clear(svg);
+    const V = vS.get(), E = eS.get();
+    const Q = E / V;
+
+    /* ---- fixed axes ---- */
+    S("line", { x1: X0, y1: Y1, x2: X1 + 10, y2: Y1, stroke: C.line, "stroke-width": 1.6 }, svg);
+    S("line", { x1: X0, y1: Y1, x2: X0, y2: Y0 - 12, stroke: C.line, "stroke-width": 1.6 }, svg);
+    for (let q = 0; q <= QMAX; q++) {
+      S("line", { x1: TX(q), y1: Y1, x2: TX(q), y2: Y1 + 5, stroke: C.line, "stroke-width": 1 }, svg);
+      T(svg, TX(q), Y1 + 18, String(q), { "text-anchor": "middle", "font-size": 10.5, fill: "#444" });
+    }
+    for (let e = 0; e <= EMAX; e += 2) {
+      S("line", { x1: X0 - 4, y1: QY(e), x2: X0, y2: QY(e), stroke: C.line, "stroke-width": 1 }, svg);
+      T(svg, X0 - 8, QY(e) + 4, String(e), { "text-anchor": "end", "font-size": 10.5, fill: "#444" });
+    }
+    T(svg, X1, Y1 + 32, "Q (C)", { "text-anchor": "end", "font-size": 12, fill: C.line });
+    T(svg, X0 - 8, Y0 - 18, "E (J)", { "text-anchor": "start", "font-size": 12, fill: C.line });
+
+    /* ---- the ray: every (Q, E) pair for this battery, slope V ---- */
+    const qEnd = Math.min(QMAX, EMAX / V);
+    S("line", { x1: TX(0), y1: QY(0), x2: TX(qEnd), y2: QY(V * qEnd),
+      stroke: C.blue, "stroke-width": 2.6 }, svg);
+
+    /* ---- one coulomb carries V joules: the unit identity, drawn at Q = 1 ---- */
+    S("line", { x1: TX(1), y1: QY(0), x2: TX(1), y2: QY(V), stroke: C.amber, "stroke-width": 2.2 }, svg);
+
+    /* ---- where the two sliders sit, with guides out to both axes ---- */
+    const px = TX(Q), py = QY(E);
+    S("line", { x1: px, y1: py, x2: px, y2: Y1, stroke: C.grey, "stroke-width": 1, "stroke-dasharray": "3 3" }, svg);
+    S("line", { x1: X0, y1: py, x2: px, y2: py, stroke: C.grey, "stroke-width": 1, "stroke-dasharray": "3 3" }, svg);
+    S("circle", { cx: px, cy: py, r: 5.5, fill: "#fff", stroke: C.blue, "stroke-width": 2.4 }, svg);
+
+    /* ---- the reading column: no text in the plot itself, so nothing can collide ---- */
+    const col = (y, s, color, size) =>
+      T(svg, CX, y, s, { "text-anchor": "middle", "font-size": size, "font-weight": 700, fill: color });
+    col(84, "V = " + V.toFixed(1) + " V", C.blue, 13);
+    col(112, "1 C \u2192 " + V.toFixed(1) + " J", C.amber, 12.5);
+    col(148, "Q = " + Q.toFixed(2) + " C", C.blue, 15);
+    col(176, "E = " + E.toFixed(0) + " J", C.grey, 12);
+
+    /* ---- the reading row ---- */
+    const latex = "Q = \\frac{E}{V} = \\frac{" + E.toFixed(0) + "\\ \\text{J}}{" + V.toFixed(1) +
+      "\\ \\text{V}} = " + Q.toFixed(2) + "\\ \\text{C}";
+    const caption = "A volt is one joule per coulomb (1 V = 1 J/C): every coulomb this " +
+      V.toFixed(1) + " V battery pushes carries " + V.toFixed(1) + " J, so " + E.toFixed(0) +
+      " J is " + Q.toFixed(2) + " C.";
+    r.set(latex, true, caption, { yes: "live readings" });
+  };
+
+  [vS, eS].forEach((s) => s.on(render));
+  render();
+}
+
 /* ---------------- Q16: the same two resistors, in series and in parallel ----------------
  *
  * q16 gives 3 ohm, 6 ohm and a 9 V battery, and its answers are
@@ -259,7 +353,7 @@ function q16(root) {
   render();
 }
 
-const REGISTRY = { q2, q16 };
+const REGISTRY = { q2, q3, q16 };
 
 export function hasGraphic(id) {
   return Boolean(REGISTRY[id]);
