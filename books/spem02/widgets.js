@@ -770,6 +770,168 @@ function q19(root) {
   render();
 }
 
+/* ---------------- Q20: three resistors in series, same current, V split in R's ratio ----
+ *
+ * q20 prints three resistors X, Y, Z of 1, 2 and 3 ohm in series on a battery, and answers
+ *     I_X : I_Y : I_Z = 1 : 1 : 1        (series: one path, one current)
+ *     V_X : V_Y : V_Z = 1 x 1 : 1 x 2 : 1 x 3 = 1 : 2 : 3
+ * The widget is that circuit with the battery voltage on a slider. The moving dots are the
+ * same current all the way round the single loop: one dot pattern travelling one closed path
+ * at one speed, so at any instant they are evenly spaced and all move the same distance —
+ * that is what "the current is the same everywhere" looks like. The three lower bars are the
+ * p.d.s, and because V_i = I R_i each bar is R_i/6 of the battery bar whatever the slider
+ * says, so th eir heights stay 1 : 2 : 3 and they add up to the battery's.
+ */
+const Q20_R = [1, 2, 3];       // ohm, printed
+const Q20_RTOT = 6;            // ohm, 1 + 2 + 3
+const Q20_V0 = 6;              // V, the default the numbers come out tidy at
+
+function q20(root) {
+  const CW = 560, CH = 310;
+  const svg = scene(CW, CH);
+  const vS = slider({ label: "battery V (V)", min: 1, max: 12, step: 1, value: Q20_V0,
+    fmt: (v) => v.toFixed(0) + " V", play: false });
+  const r = readout();
+  const state = { playing: true };
+
+  const playBtn = buttonRow([["pause current \u2016", () => {
+    state.playing = !state.playing;
+    playBtn.querySelector("button").textContent = state.playing ? "pause current \u2016" : "run current \u25B6";
+  }]]);
+
+  root.append(
+    question("Three resistors X, Y and Z of 1 \u03A9, 2 \u03A9 and 3 \u03A9 are connected in series to a battery. Find I_X : I_Y : I_Z and V_X : V_Y : V_Z.", [
+      "In series there is one path, so the current is the same everywhere: $I_X = I_Y = I_Z$",
+      "The p.d. across each is $V_i = I R_i$, so $V \\propto R$",
+      "$1 : 2 : 3$ for the p.d.s, $1 : 1 : 1$ for the currents",
+    ]),
+    svg,
+    vS.el, playBtn, r.el,
+  );
+
+  // the single loop the dots run round, and the drawing frame
+  const TOP = 80, BOT = 230, BATX = 64, RIGX = 400, BASE = 214, BARH = 70;
+  const RX = [160, 260, 360];                    // the three resistors' centres
+  const LOOP = [[BATX, TOP], [RIGX, TOP], [RIGX, BOT], [BATX, BOT], [BATX, TOP]];
+  const SEG = [];
+  let TOTAL = 0;
+  for (let i = 1; i < LOOP.length; i++) {
+    const a = LOOP[i - 1], b = LOOP[i];
+    const L = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    SEG.push({ a, b, L, s0: TOTAL });
+    TOTAL += L;
+  }
+  const at = (s) => {
+    let t = ((s % TOTAL) + TOTAL) % TOTAL;
+    for (const g of SEG) {
+      if (t <= g.s0 + g.L) {
+        const k = g.L ? (t - g.s0) / g.L : 0;
+        return [g.a[0] + (g.b[0] - g.a[0]) * k, g.a[1] + (g.b[1] - g.a[1]) * k];
+      }
+    }
+    return LOOP[0];
+  };
+
+  let raf = 0, last = 0, phase = 0;
+  const NDOT = 16;
+
+  const render = () => {
+    if (raf) { cancelAnimationFrame(raf); raf = 0; }
+    last = 0;
+    clear(svg);
+    const V = vS.get();
+    const I = V / Q20_RTOT;
+    const VX = I * Q20_R[0], VY = I * Q20_R[1], VZ = I * Q20_R[2];
+
+    const wire = (pts, color, w) => S("path", {
+      d: pts.map((p, i) => (i ? "L" : "M") + p[0] + " " + p[1]).join(" "),
+      fill: "none", stroke: color || C.line, "stroke-width": w || 2, "stroke-linejoin": "round",
+    }, svg);
+
+    /* ---- the loop, with the current dots drawn first so they pass behind the resistors ---- */
+    wire(LOOP);
+    const dots = [];
+    for (let i = 0; i < NDOT; i++) {
+      dots.push(S("circle", { cx: -10, cy: -10, r: 3, fill: C.red }, svg));
+    }
+    const place = () => {
+      for (let i = 0; i < NDOT; i++) {
+        const [x, y] = at(phase + (i * TOTAL) / NDOT);
+        dots[i].setAttribute("cx", x.toFixed(2));
+        dots[i].setAttribute("cy", y.toFixed(2));
+      }
+    };
+    place();
+
+    /* ---- the battery ---- */
+    wire([[BATX, TOP], [BATX, 140]]);
+    wire([[BATX, 192], [BATX, BOT]]);
+    S("line", { x1: BATX - 13, y1: 140, x2: BATX + 13, y2: 140, stroke: C.line, "stroke-width": 3 }, svg);
+    S("line", { x1: BATX - 7, y1: 149, x2: BATX + 7, y2: 149, stroke: C.line, "stroke-width": 3 }, svg);
+    S("line", { x1: BATX - 13, y1: 160, x2: BATX + 13, y2: 160, stroke: C.line, "stroke-width": 3 }, svg);
+    S("line", { x1: BATX - 7, y1: 169, x2: BATX + 7, y2: 169, stroke: C.line, "stroke-width": 3 }, svg);
+    T(svg, BATX - 22, 160, "V = " + V.toFixed(0) + " V", { "text-anchor": "end", "font-size": 12 },
+      svg);
+
+    /* ---- the three resistors in series along the top rail ---- */
+    const names = ["X", "Y", "Z"];
+    RX.forEach((cx, i) => {
+      S("rect", { x: cx - 28, y: TOP - 8, width: 56, height: 16, fill: C.paper, stroke: C.line, "stroke-width": 2 }, svg);
+      T(svg, cx, TOP - 15, names[i], { "text-anchor": "middle", "font-size": 12.5, "font-weight": 700, fill: C.ink });
+      T(svg, cx, TOP + 24, Q20_R[i] + " \u03A9", { "text-anchor": "middle", "font-size": 11, "fill": C.grey });
+    });
+
+    /* ---- the p.d. bars: R_i/6 of the battery bar, so they stay 1 : 2 : 3 ---- */
+    const hOf = (v) => (v / 12) * BARH;      // the battery bar is 70 px at 12 V
+    const bar = (cx, h, color, label, txt) => {
+      S("rect", { x: cx - 13, y: BASE - h, width: 26, height: h, fill: color,
+        "fill-opacity": "0.28", stroke: color, "stroke-width": 1.6 }, svg);
+      T(svg, cx, BASE - h - 5, txt, { "text-anchor": "middle", "font-size": 10, "font-weight": 700, fill: color });
+      T(svg, cx, BASE + 12, label, { "text-anchor": "middle", "font-size": 10, fill: C.grey });
+    };
+    bar(100, hOf(V), C.line, "V", V.toFixed(1) + " V");
+    bar(RX[0], hOf(VX), C.blue, "V_X", VX.toFixed(2) + " V");
+    bar(RX[1], hOf(VY), C.green, "V_Y", VY.toFixed(2) + " V");
+    bar(RX[2], hOf(VZ), C.amber, "V_Z", VZ.toFixed(2) + " V");
+
+    /* ---- the fixed reading column ---- */
+    const CX = 505;
+    const col = (y, s, color, size) =>
+      T(svg, CX, y, s, { "text-anchor": "middle", "font-size": size, "font-weight": 700, fill: color });
+    col(64, "V = " + V.toFixed(0) + " V", C.ink, 12.5);
+    col(94, "I = " + I.toFixed(2) + " A", C.red, 13);
+    col(126, "V_X = " + VX.toFixed(2) + " V", C.blue, 12);
+    col(152, "V_Y = " + VY.toFixed(2) + " V", C.green, 12);
+    col(178, "V_Z = " + VZ.toFixed(2) + " V", C.amber, 12);
+    col(212, "I_X:I_Y:I_Z = 1:1:1", C.red, 12);
+    col(238, "V_X:V_Y:V_Z = 1:2:3", C.blue, 12);
+    col(266, "same current everywhere", C.grey, 10.5);
+
+    /* ---- the reading row ---- */
+    const latex = "I = \\frac{V}{6} = " + I.toFixed(2) + "\\ \\text{A},\\quad V_X = " + VX.toFixed(2) +
+      "\\ \\text{V},\\quad V_Y = " + VY.toFixed(2) + "\\ \\text{V},\\quad V_Z = " + VZ.toFixed(2) + "\\ \\text{V}";
+    const caption = "In series one current runs through all three, so I_X : I_Y : I_Z = 1 : 1 : 1. The p.d. is V_i = I R_i, so V_X : V_Y : V_Z = 1 : 2 : 3 and the three add up to the " +
+      V.toFixed(0) + " V of the battery (" + VX.toFixed(2) + " + " + VY.toFixed(2) + " + " + VZ.toFixed(2) + " = " + (VX + VY + VZ).toFixed(2) + " V).";
+    r.set(latex, true, caption, { yes: "live readings" });
+
+    /* ---- run the current round the loop; speed follows the current, one path so one speed ---- */
+    const speed = 12 + 30 * (I / 2);       // px per second at this current
+    const tick = (ts) => {
+      raf = requestAnimationFrame(tick);
+      if (!last) { last = ts; return; }
+      const dt = Math.min(0.06, (ts - last) / 1000);
+      last = ts;
+      if (!state.playing) return;
+      phase = (phase + dt * speed) % TOTAL;
+      place();
+    };
+    raf = requestAnimationFrame(tick);
+  };
+
+  vS.on(render);
+  render();
+}
+
 /* ---------------- Q16: the same two resistors, in series and in parallel ----------------
  *
  * q16 gives 3 ohm, 6 ohm and a 9 V battery, and its answers are
@@ -904,7 +1066,7 @@ function q16(root) {
   render();
 }
 
-const REGISTRY = { q2, q3, q6, q9, q19, q36, q16 };
+const REGISTRY = { q2, q3, q6, q9, q19, q20, q36, q16 };
 
 export function hasGraphic(id) {
   return Boolean(REGISTRY[id]);
