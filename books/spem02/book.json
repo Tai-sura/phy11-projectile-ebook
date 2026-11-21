@@ -1032,6 +1032,19 @@
       "title": "One circuit, two reference points: 0 V at A"
     },
     {
+      "page": 17,
+      "region": [
+        12,
+        133.7,
+        291.3,
+        315
+      ],
+      "scene": "spem02:Measurement",
+      "src": "media/measurement-panel-1.mp4",
+      "poster": "media/measurement-panel-1-poster.png",
+      "title": "The ammeter also carries the voltmeter current"
+    },
+    {
       "page": 18,
       "region": [
         56,
