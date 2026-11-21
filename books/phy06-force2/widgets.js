@@ -282,8 +282,23 @@ function q35(root) {
       // It ends on the pulley's rim, on the line from the pulley centre to that point.
       const attX = cx + dx * hX, attY = cy + dy * hX;
       // the pulley sits just to the right of the apex and a little above it, so the rope
-      // grazes the top of the plane and Y hangs in the clear air to the right of the wedge
-      const pulX = tipX + 18, pulY = tipY - 12;
+      // grazes the top of the plane and Y hangs in the clear air to the right of the wedge.
+      //
+      // From theta = 33 deg the top end of the plane climbs so close to the apex that a
+      // pulley at the base offset would sit on the plane's own line: the signed distance
+      // (measured along the plane's outward normal) is (12 + lift) cos θ − 18 sin θ, which
+      // is 0.26 px at 33 deg and −11.1 px at 64.5 deg (i.e. inside the wedge). So the
+      // pulley is lifted just enough to keep 24 px between its centre and that line. The
+      // lift is faded in over 33..36.9 deg so nothing snaps when the slider crosses 33, and
+      // it never lifts the centre above y = 14, where it simply stops (no forcing).
+      const srad = Math.sin(rad), crad = Math.cos(rad);
+      let lift = 0;
+      if (th >= 33) {
+        const need = Math.max(0, (24 + 18 * srad) / crad - 12);
+        lift = need * Math.min(1, (th - 33) / 3.9);
+      }
+      lift = Math.max(0, Math.min(lift, tipY - 26));
+      const pulX = tipX + 18, pulY = tipY - 12 - lift;
       const rdx = attX - pulX, rdy = attY - pulY;
       const rl = Math.hypot(rdx, rdy) || 1;
       S("line", { x1: attX, y1: attY, x2: pulX + (rdx / rl) * 6, y2: pulY + (rdy / rl) * 6,
