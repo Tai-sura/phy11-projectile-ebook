@@ -281,9 +281,9 @@ function q35(root) {
       // (s/2, 0), so it is the centre offset by hX along the plane, NOT the bbox edge.
       // It ends on the pulley's rim, on the line from the pulley centre to that point.
       const attX = cx + dx * hX, attY = cy + dy * hX;
-      // the pulley sits a fixed step off the apex along the normal, so it stays just
-      // above the top of the plane at every angle; Y hangs a fixed drop below it
-      const pulX = tipX + nx * 18, pulY = tipY + ny * 18;
+      // the pulley sits just to the right of the apex and a little above it, so the rope
+      // grazes the top of the plane and Y hangs in the clear air to the right of the wedge
+      const pulX = tipX + 18, pulY = tipY - 12;
       const rdx = attX - pulX, rdy = attY - pulY;
       const rl = Math.hypot(rdx, rdy) || 1;
       S("line", { x1: attX, y1: attY, x2: pulX + (rdx / rl) * 6, y2: pulY + (rdy / rl) * 6,
