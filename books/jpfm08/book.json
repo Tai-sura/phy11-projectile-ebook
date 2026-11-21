@@ -614,5 +614,20 @@
         ]
       }
     }
-  }
+  },
+  "media": [
+    {
+      "page": 15,
+      "region": [
+        30,
+        290,
+        565,
+        790
+      ],
+      "scene": "jpfm08:CentreOfMass",
+      "src": "media/q31-com-2.mp4",
+      "poster": "media/q31-com-2-poster.png",
+      "title": "Hang it twice: the two plumb lines cross at the centre of mass"
+    }
+  ]
 }
