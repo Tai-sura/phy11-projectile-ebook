@@ -356,7 +356,14 @@ function q18(root) {
   let timer = 0, step = 0;
   const stop = () => { if (timer) { clearInterval(timer); timer = 0; } };
 
+  const view = { v: 0 }; // 0 = forces + components, 1 = x components only, 2 = y components only
   const btns = H("div", { class: "g-btns" });
+  const vBtns = H("div", { class: "g-btns" });
+  const vchips = ["full", "x components only", "y components only"].map((t, i) => {
+    const b = H("button", { type: "button", onclick: () => { view.v = i; render(); } }, [t]);
+    vBtns.append(b);
+    return b;
+  });
   const chips = Q18F.map((f, i) => {
     const b = H("button", { type: "button", onclick: () => { on[i] = !on[i]; stop(); render(); } }, [`${f.name} ✓`]);
     btns.append(b);
@@ -381,7 +388,7 @@ function q18(root) {
       "Components add: $\\Sigma F_x$, $\\Sigma F_y$",
     ]),
     svg,
-    H("div", {}, [btns, playBtn]),
+    H("div", {}, [btns, playBtn, vBtns]),
     r.el,
   );
 
@@ -412,14 +419,43 @@ function q18(root) {
     T(svg, 14, PY - 8, "+y (up)", { "font-size": 11, fill: C.grey });
     T(svg, CW - 14, PY + 18, "+x (right)", { "text-anchor": "end", "font-size": 11, fill: C.grey });
 
-    // the four forces, drawn from P
+    // the four forces, their dashed decompositions, and the component arrows
+    vchips.forEach((b, i) => {
+      b.style.opacity = view.v === i ? "1" : "0.5";
+      b.style.fontWeight = view.v === i ? "700" : "400";
+    });
     Q18F.forEach((f, i) => {
       if (!on[i]) return;
-      const x2 = PX + f.dx * U, y2 = PY - f.dy * U;
-      S("line", { x1: PX, y1: PY, x2, y2, stroke: f.color, "stroke-width": 3, "stroke-linecap": "round",
-        "marker-end": `url(#arr-${svg.dataset.uid})` }, svg);
-      const len = Math.hypot(f.dx, f.dy) * U || 1;
-      put(x2 + (12 * (x2 - PX)) / len, y2 + (12 * (y2 - PY)) / len - 2, f.name, f.color, 700, 12);
+      const ix = PX + f.dx * U, iy = PY - f.dy * U;
+      if (view.v === 0) {
+        S("line", { x1: PX, y1: PY, x2: ix, y2: iy, stroke: f.color, "stroke-width": 3, "stroke-linecap": "round",
+          "marker-end": `url(#arr-${svg.dataset.uid})` }, svg);
+        // dashed guides out to both axes, in the force's own colour
+        if (f.dx !== 0) {
+          S("line", { x1: ix, y1: iy, x2: ix, y2: PY, stroke: f.color, "stroke-width": 1.3,
+            "stroke-dasharray": "4 3", opacity: 0.75 }, svg);
+        }
+        if (f.dy !== 0) {
+          S("line", { x1: ix, y1: iy, x2: PX, y2: iy, stroke: f.color, "stroke-width": 1.3,
+            "stroke-dasharray": "4 3", opacity: 0.75 }, svg);
+        }
+        const len = Math.hypot(f.dx, f.dy) * U || 1;
+        put(ix + (12 * (ix - PX)) / len, iy + (12 * (iy - PY)) / len - 2, f.name, f.color, 700, 12);
+      }
+      if (f.dx !== 0 && view.v !== 2) {
+        S("line", { x1: PX, y1: PY, x2: ix, y2: PY, stroke: f.color, "stroke-width": 2.2,
+          "stroke-dasharray": "6 4", "stroke-linecap": "butt",
+          "marker-end": `url(#arr-${svg.dataset.uid})` }, svg);
+        T(svg, ix, PY + 18 + (f.dx > 0 ? 20 : 0) + (i % 2) * 13, `${f.name}x`,
+          { "text-anchor": "middle", "font-size": 10.5, "font-weight": 700, fill: f.color });
+      }
+      if (f.dy !== 0 && view.v !== 1) {
+        S("line", { x1: PX, y1: PY, x2: PX, y2: iy, stroke: f.color, "stroke-width": 2.2,
+          "stroke-dasharray": "6 4", "stroke-linecap": "butt",
+          "marker-end": `url(#arr-${svg.dataset.uid})` }, svg);
+        T(svg, PX - 14 - (i % 2) * 18, iy + (f.dy > 0 ? -6 : 12), `${f.name}y`,
+          { "text-anchor": "end", "font-size": 10.5, "font-weight": 700, fill: f.color });
+      }
     });
 
     // the resultant, from the same point
@@ -433,7 +469,7 @@ function q18(root) {
       put(x2 + 26, y2 - 6, `R = ${K18(mag)} N`, C.ink, 700, 12.5);
     }
     S("circle", { cx: PX, cy: PY, r: 4.5, fill: C.ink }, svg);
-    T(svg, PX - 6, PY + 16, "P", { "text-anchor": "end", "font-size": 12, "font-weight": 700, fill: C.ink });
+    T(svg, PX - 16, PY + 30, "P", { "text-anchor": "end", "font-size": 12, "font-weight": 700, fill: C.ink });
 
     // the algebra, exactly as the printed working writes it
     const sign = (v, first) => (first ? (v < 0 ? `-${Math.abs(v)}` : `${v}`) : v < 0 ? `-${Math.abs(v)}` : `+${v}`);
