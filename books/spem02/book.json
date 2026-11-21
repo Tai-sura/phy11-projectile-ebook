@@ -1,0 +1,939 @@
+{
+  "id": "spem02",
+  "form": "S5",
+  "code": "SPEM02",
+  "title": "Electric Circuits",
+  "topic": "E and M (Circuit)",
+  "year": 2026,
+  "status": "draft",
+  "storage": "spem02",
+  "source": {
+    "que": "source/Chapter 2 Electric Circuit - regular 2026-27 @Uni.pdf",
+    "ans": "source/Chapter 2 Electric Circuit - regular 2026-27 (Ans) @Uni.pdf",
+    "ansPageOffset": 0
+  },
+  "sections": [
+    {
+      "id": "current",
+      "label": "Current"
+    },
+    {
+      "id": "voltage",
+      "label": "Voltage"
+    },
+    {
+      "id": "resistance",
+      "label": "Resistance"
+    },
+    {
+      "id": "network",
+      "label": "Resistor network"
+    },
+    {
+      "id": "rheostat",
+      "label": "Rheostat"
+    },
+    {
+      "id": "potential",
+      "label": "Electric potential in a circuit"
+    },
+    {
+      "id": "measurement",
+      "label": "Measurement of resistance"
+    },
+    {
+      "id": "internal",
+      "label": "Internal resistance"
+    }
+  ],
+  "continuation": {
+    "top": 96,
+    "x": 48,
+    "width": 499,
+    "bottom": 812
+  },
+  "extract": {
+    "zoom": 3,
+    "regionX": [
+      66,
+      546
+    ],
+    "footer": 822,
+    "questions": [
+      {
+        "id": "q1",
+        "page": 1,
+        "label": "1",
+        "section": "current"
+      },
+      {
+        "id": "q2",
+        "page": 1,
+        "label": "2",
+        "section": "current"
+      },
+      {
+        "id": "q3",
+        "page": 1,
+        "label": "3",
+        "section": "voltage"
+      },
+      {
+        "id": "q4",
+        "page": 2,
+        "label": "4",
+        "section": "resistance"
+      },
+      {
+        "id": "q5",
+        "page": 3,
+        "label": "5",
+        "section": "resistance"
+      },
+      {
+        "id": "q6",
+        "page": 3,
+        "label": "6",
+        "section": "resistance"
+      },
+      {
+        "id": "q7",
+        "page": 3,
+        "label": "7",
+        "section": "resistance"
+      },
+      {
+        "id": "q8",
+        "page": 4,
+        "label": "8",
+        "section": "resistance"
+      },
+      {
+        "id": "q9",
+        "page": 4,
+        "label": "9",
+        "section": "resistance"
+      },
+      {
+        "id": "q10",
+        "page": 4,
+        "label": "10",
+        "section": "resistance"
+      },
+      {
+        "id": "q11",
+        "page": 4,
+        "label": "11",
+        "section": "resistance"
+      },
+      {
+        "id": "q12",
+        "page": 5,
+        "label": "12",
+        "section": "network"
+      },
+      {
+        "id": "q13",
+        "page": 6,
+        "label": "13",
+        "section": "network"
+      },
+      {
+        "id": "q14",
+        "page": 7,
+        "label": "14",
+        "section": "network"
+      },
+      {
+        "id": "q15",
+        "page": 7,
+        "label": "15",
+        "section": "network"
+      },
+      {
+        "id": "q16",
+        "page": 7,
+        "label": "16",
+        "section": "network"
+      },
+      {
+        "id": "q17",
+        "page": 7,
+        "label": "17",
+        "section": "network"
+      },
+      {
+        "id": "q18",
+        "page": 8,
+        "label": "18",
+        "section": "network"
+      },
+      {
+        "id": "q19",
+        "page": 8,
+        "label": "19",
+        "section": "network"
+      },
+      {
+        "id": "q20",
+        "page": 9,
+        "label": "20",
+        "section": "network"
+      },
+      {
+        "id": "q21",
+        "page": 9,
+        "label": "21",
+        "section": "network"
+      },
+      {
+        "id": "q22",
+        "page": 9,
+        "label": "22",
+        "section": "network"
+      },
+      {
+        "id": "q23",
+        "page": 9,
+        "label": "23",
+        "section": "network"
+      },
+      {
+        "id": "q24",
+        "page": 9,
+        "label": "24",
+        "section": "network"
+      },
+      {
+        "id": "q25",
+        "page": 10,
+        "label": "25",
+        "section": "network"
+      },
+      {
+        "id": "q26",
+        "page": 10,
+        "label": "26",
+        "section": "network"
+      },
+      {
+        "id": "q27",
+        "page": 10,
+        "label": "27",
+        "section": "network"
+      },
+      {
+        "id": "q28",
+        "page": 10,
+        "label": "28",
+        "section": "network"
+      },
+      {
+        "id": "q29",
+        "page": 11,
+        "label": "29",
+        "section": "network"
+      },
+      {
+        "id": "q30",
+        "page": 11,
+        "label": "30",
+        "section": "network"
+      },
+      {
+        "id": "q31",
+        "page": 11,
+        "label": "31",
+        "section": "network"
+      },
+      {
+        "id": "q32",
+        "page": 11,
+        "label": "32",
+        "section": "network"
+      },
+      {
+        "id": "q33",
+        "page": 11,
+        "label": "33",
+        "section": "network"
+      },
+      {
+        "id": "q33b",
+        "page": 12,
+        "label": "33",
+        "section": "network"
+      },
+      {
+        "id": "q34",
+        "page": 12,
+        "label": "34",
+        "section": "network"
+      },
+      {
+        "id": "q35",
+        "page": 12,
+        "label": "35",
+        "section": "network"
+      },
+      {
+        "id": "q36",
+        "page": 13,
+        "label": "36",
+        "section": "network"
+      },
+      {
+        "id": "q37",
+        "page": 13,
+        "label": "37",
+        "section": "network"
+      },
+      {
+        "id": "q38",
+        "page": 13,
+        "label": "38",
+        "section": "network"
+      },
+      {
+        "id": "q39",
+        "page": 13,
+        "label": "39",
+        "section": "network"
+      },
+      {
+        "id": "q40",
+        "page": 14,
+        "label": "40",
+        "section": "rheostat"
+      },
+      {
+        "id": "q41",
+        "page": 14,
+        "label": "41",
+        "section": "rheostat"
+      },
+      {
+        "id": "q42",
+        "page": 14,
+        "label": "42",
+        "section": "rheostat"
+      },
+      {
+        "id": "q43",
+        "page": 15,
+        "label": "43",
+        "section": "rheostat"
+      },
+      {
+        "id": "q44",
+        "page": 15,
+        "label": "44",
+        "section": "rheostat"
+      },
+      {
+        "id": "q45",
+        "page": 15,
+        "label": "45",
+        "section": "rheostat"
+      },
+      {
+        "id": "q46",
+        "page": 16,
+        "label": "46",
+        "section": "potential"
+      },
+      {
+        "id": "q47",
+        "page": 16,
+        "label": "47",
+        "section": "potential"
+      },
+      {
+        "id": "q48",
+        "page": 16,
+        "label": "48",
+        "section": "potential"
+      },
+      {
+        "id": "q49",
+        "page": 17,
+        "label": "49",
+        "section": "measurement"
+      },
+      {
+        "id": "q50",
+        "page": 17,
+        "label": "50",
+        "section": "measurement"
+      },
+      {
+        "id": "q51",
+        "page": 18,
+        "label": "51",
+        "section": "internal"
+      },
+      {
+        "id": "q52",
+        "page": 18,
+        "label": "52",
+        "section": "internal"
+      },
+      {
+        "id": "q53",
+        "page": 18,
+        "label": "53",
+        "section": "internal"
+      },
+      {
+        "id": "q54",
+        "page": 19,
+        "label": "54",
+        "section": "internal"
+      },
+      {
+        "id": "q55",
+        "page": 19,
+        "label": "55",
+        "section": "internal"
+      },
+      {
+        "id": "q56",
+        "page": 19,
+        "label": "56",
+        "section": "internal"
+      },
+      {
+        "id": "q57",
+        "page": 20,
+        "label": "57",
+        "section": "internal"
+      }
+    ],
+    "anchors": {},
+    "fixedAnchors": {},
+    "overrides": {
+      "q1": {
+        "region": [
+          66,
+          308.6,
+          546,
+          352.1
+        ],
+        "space": 200
+      },
+      "q2": {
+        "region": [
+          66,
+          395,
+          546,
+          450
+        ],
+        "space": 90
+      },
+      "q3": {
+        "region": [
+          66,
+          770.7,
+          534,
+          781
+        ],
+        "space": 135
+      },
+      "q4": {
+        "region": [
+          66,
+          731.4,
+          388,
+          817.4
+        ],
+        "space": 160
+      },
+      "q20": {
+        "region": [
+          176,
+          133,
+          520,
+          234
+        ],
+        "space": 40,
+        "square": [
+          549.5,
+          147.3,
+          578,
+          176
+        ]
+      },
+      "q21": {
+        "region": [
+          176,
+          293,
+          520,
+          390
+        ],
+        "space": 55,
+        "square": [
+          547.9,
+          307.5,
+          576.4,
+          336.2
+        ]
+      },
+      "q22": {
+        "region": [
+          270,
+          466,
+          372,
+          553
+        ],
+        "space": 50,
+        "square": [
+          553.1,
+          438.2,
+          581.2,
+          469
+        ]
+      },
+      "q24": {
+        "region": [
+          98,
+          711,
+          405,
+          788
+        ],
+        "space": 45,
+        "square": [
+          554.1,
+          720.9,
+          582.2,
+          751.7
+        ]
+      },
+      "q29": {
+        "region": [
+          66,
+          178,
+          398,
+          203
+        ],
+        "space": 145,
+        "square": [
+          555.7,
+          83.7,
+          584.5,
+          112.4
+        ]
+      },
+      "q32": {
+        "region": [
+          264,
+          589,
+          440,
+          690
+        ],
+        "space": 120,
+        "square": [
+          555.1,
+          564.2,
+          583.9,
+          593
+        ]
+      },
+      "q33": {
+        "region": [
+          100,
+          725,
+          444,
+          788
+        ],
+        "space": 45,
+        "square": [
+          558,
+          709.4,
+          586.7,
+          738.2
+        ]
+      },
+      "q37": {
+        "region": [
+          292,
+          404,
+          445,
+          515
+        ],
+        "space": 170,
+        "square": [
+          557.2,
+          391.5,
+          585.2,
+          422.3
+        ]
+      },
+      "q38": {
+        "region": [
+          95,
+          554,
+          420,
+          672
+        ],
+        "space": 110,
+        "square": [
+          557.4,
+          600.7,
+          585.4,
+          631.5
+        ]
+      },
+      "q40": {
+        "region": [
+          66,
+          467.5,
+          546,
+          516
+        ],
+        "space": 70
+      },
+      "q42": {
+        "region": [
+          88,
+          708,
+          528,
+          786
+        ],
+        "space": 0,
+        "square": [
+          549.1,
+          686.8,
+          577.1,
+          717.6
+        ]
+      },
+      "q46": {
+        "region": [
+          66,
+          468,
+          494,
+          504
+        ],
+        "space": 200
+      },
+      "q47": {
+        "region": [
+          246,
+          540,
+          404,
+          650
+        ],
+        "space": 105,
+        "square": [
+          557.8,
+          610.5,
+          585.8,
+          641.3
+        ]
+      },
+      "q48": {
+        "region": [
+          66,
+          777.5,
+          441,
+          799
+        ],
+        "space": 240
+      },
+      "q49": {
+        "region": [
+          136,
+          598,
+          544,
+          644
+        ],
+        "space": 100,
+        "square": [
+          555.8,
+          538.5,
+          585.8,
+          565.5
+        ]
+      },
+      "q50": {
+        "region": [
+          152,
+          736,
+          238,
+          786
+        ],
+        "space": 170,
+        "square": [
+          555.8,
+          698.2,
+          585.8,
+          725.2
+        ]
+      },
+      "q51": {
+        "region": [
+          66,
+          483,
+          546,
+          489
+        ],
+        "space": 120,
+        "square": [
+          554.6,
+          409.4,
+          582.6,
+          440.2
+        ]
+      },
+      "q52": {
+        "region": [
+          100,
+          527,
+          452,
+          610
+        ],
+        "space": 60,
+        "square": [
+          553.1,
+          538.4,
+          581.1,
+          569.2
+        ]
+      },
+      "q54": {
+        "region": [
+          102,
+          143,
+          420,
+          250
+        ],
+        "space": 65,
+        "square": [
+          548.6,
+          89.6,
+          579.4,
+          121.8
+        ]
+      },
+      "q5": {
+        "region": [
+          66,
+          194.2,
+          406,
+          234.2
+        ],
+        "space": 210
+      },
+      "q6": {
+        "region": [
+          66,
+          351.2,
+          448,
+          427.2
+        ],
+        "space": 220
+      },
+      "q8": {
+        "region": [
+          66,
+          281.9,
+          546,
+          351.9
+        ],
+        "space": 125
+      },
+      "q9": {
+        "region": [
+          66,
+          418.8,
+          546,
+          502.8
+        ],
+        "space": 275
+      },
+      "q10": {
+        "region": [
+          66,
+          592.6,
+          374,
+          666.6
+        ],
+        "space": 135
+      },
+      "q12": {
+        "region": [
+          66,
+          657,
+          212,
+          817
+        ],
+        "space": 50
+      },
+      "q14": {
+        "region": [
+          66,
+          126.4,
+          376,
+          194.4
+        ],
+        "space": 70
+      },
+      "q15": {
+        "region": [
+          66,
+          241.3,
+          306,
+          331.3
+        ],
+        "space": 50
+      },
+      "q17": {
+        "region": [
+          66,
+          730.6,
+          388,
+          816.6
+        ],
+        "space": 80
+      },
+      "q18": {
+        "region": [
+          66,
+          216.3,
+          364,
+          408.3
+        ],
+        "space": 30
+      },
+      "q19": {
+        "region": [
+          66,
+          551.2,
+          372,
+          817.2
+        ],
+        "space": 115
+      },
+      "q26": {
+        "region": [
+          66,
+          391.8,
+          334,
+          443.8
+        ],
+        "space": 95
+      },
+      "q27": {
+        "region": [
+          66,
+          586.5,
+          546,
+          626.5
+        ],
+        "space": 180
+      },
+      "q30": {
+        "region": [
+          202,
+          241.7,
+          410,
+          323.7
+        ],
+        "space": 145
+      },
+      "q28": {
+        "region": [
+          112,
+          697.5,
+          336,
+          817.5
+        ],
+        "space": 255
+      },
+      "q31": {
+        "region": [
+          66,
+          462.2,
+          468,
+          542.2
+        ],
+        "space": 100
+      },
+      "q36": {
+        "region": [
+          66,
+          115.8,
+          336,
+          343.8
+        ],
+        "space": 35
+      },
+      "q39": {
+        "region": [
+          66,
+          772.4,
+          384,
+          816.4
+        ],
+        "space": 115
+      },
+      "q41": {
+        "region": [
+          66,
+          606.3,
+          546,
+          644.3
+        ],
+        "space": 110
+      },
+      "q43": {
+        "region": [
+          292,
+          227.9,
+          546,
+          361.9
+        ],
+        "space": 20
+      },
+      "q44": {
+        "region": [
+          66,
+          499,
+          546,
+          573
+        ],
+        "space": 70
+      },
+      "q45": {
+        "region": [
+          66,
+          710.9,
+          528,
+          816.9
+        ],
+        "space": 55
+      },
+      "q53": {
+        "region": [
+          66,
+          731,
+          408,
+          817
+        ],
+        "space": 105
+      },
+      "q55": {
+        "region": [
+          66,
+          357.2,
+          546,
+          413.2
+        ],
+        "space": 170
+      },
+      "q13": {
+        "space": 120
+      }
+    }
+  }
+}
