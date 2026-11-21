@@ -1,6 +1,6 @@
 {
-  "name": "Maths Solution Ebooks",
-  "short_name": "Maths Ebooks",
+  "name": "Physics Solution Ebooks",
+  "short_name": "Physics Ebooks",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
