@@ -301,13 +301,17 @@ function q35(root) {
       const pulX = tipX + 18, pulY = tipY - 12 - lift;
       const rdx = attX - pulX, rdy = attY - pulY;
       const rl = Math.hypot(rdx, rdy) || 1;
-      S("line", { x1: attX, y1: attY, x2: pulX + (rdx / rl) * 6, y2: pulY + (rdy / rl) * 6,
+      S("line", { x1: attX, y1: attY, x2: pulX + (rdx / rl) * 9, y2: pulY + (rdy / rl) * 9,
         stroke: C.line, "stroke-width": 1.6 }, svg);
-      S("circle", { cx: pulX, cy: pulY, r: 6, fill: "#fff", stroke: C.line, "stroke-width": 2 }, svg);
+      S("circle", { cx: pulX, cy: pulY, r: 9, fill: "#fff", stroke: C.line, "stroke-width": 2 }, svg);
+      // the load hangs from the pulley's rim on its far side, the way the rope actually
+      // leaves a pulley; hanging it on the centre line would put the 30 x 24 block across
+      // the incoming rope once the rope is steep (it did, from about 60 deg upwards)
+      const hangX = pulX + 9;
       const yTop = pulY + 30;
-      S("line", { x1: pulX, y1: pulY + 6, x2: pulX, y2: yTop, stroke: C.line, "stroke-width": 1.6 }, svg);
-      S("rect", { x: pulX - 15, y: yTop, width: 30, height: 24, fill: C.amberSoft, stroke: C.amber, "stroke-width": 2 }, svg);
-      T(svg, pulX, yTop + 16, "Y", { "text-anchor": "middle", "font-size": 11, "font-weight": 700, fill: C.amber });
+      S("line", { x1: hangX, y1: pulY, x2: hangX, y2: yTop, stroke: C.line, "stroke-width": 1.6 }, svg);
+      S("rect", { x: hangX - 15, y: yTop, width: 30, height: 24, fill: C.amberSoft, stroke: C.amber, "stroke-width": 2 }, svg);
+      T(svg, hangX, yTop + 16, "Y", { "text-anchor": "middle", "font-size": 11, "font-weight": 700, fill: C.amber });
     }
 
     /* ---- the fixed readout row ---- */
