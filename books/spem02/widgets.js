@@ -219,6 +219,106 @@ function q3(root) {
   render();
 }
 
+/* ---------------- Q6: the V-I line of one conductor, slope = R ----------------
+ *
+ * q6 reads a V-I graph and answers R = 12/3 = 4 ohm for the straight part, then notes that
+ * above 12 V the line is steeper, so the resistance falls. The widget keeps the printed
+ * data point (3 A, 12 V) and the single-conductor idea: one straight line through the
+ * origin, slope R, and the same current I = 3 A marked on it. At R = 4 ohm the line passes
+ * exactly through the printed point, which is where the printed answer comes from.
+ *
+ * The graph is V against I (V up, I across), which is how the printed figure is drawn, so a
+ * BIGGER resistance makes the line STEEPER — the printed solution says the same in words
+ * ("the line is steeper, so the resistance falls"). Axes are fixed at I 0..6 A and
+ * V 0..20 V; the live point sits at I = 3 A, so it is inside the frame for every R.
+ */
+const Q6_R0 = 4;     // ohm, the printed R = 12/3
+const Q6_I = 3;      // A, the current the printed point is read at
+const Q6_V = 12;     // V, the printed point
+
+function q6(root) {
+  const CW = 560, CH = 240;
+  const svg = scene(CW, CH);
+  const rS = slider({ label: "resistance R (\u03A9)", min: 0.5, max: 5, step: 0.1, value: Q6_R0,
+    fmt: (v) => v.toFixed(1) + " \u03A9", play: false });
+  const r = readout();
+
+  root.append(
+    question("The V-I graph of a conductor is a straight line through the origin, reading 12 V at 3 A. What is its resistance?", [
+      "For a fixed resistance $V = RI$, so the line through the origin has slope $R$",
+      "Reading the printed point: $R = V/I = 12/3$",
+      "A bigger $R$ makes the line steeper; a smaller $R$ flattens it",
+    ]),
+    svg,
+    rS.el, r.el,
+  );
+
+  // fixed plot frame: I 0..6 A across, V 0..20 V up; the reading column sits clear of it
+  const X0 = 74, X1 = 436, Y0 = 40, Y1 = 200, CX = 500;
+  const IMAX = 6, VMAX = 20;
+  const TX = (i) => X0 + (i / IMAX) * (X1 - X0);
+  const QY = (v) => Y1 - (v / VMAX) * (Y1 - Y0);
+
+  const render = () => {
+    clear(svg);
+    const R = rS.get();
+    const V = R * Q6_I;
+
+    /* ---- fixed axes ---- */
+    S("line", { x1: X0, y1: Y1, x2: X1 + 10, y2: Y1, stroke: C.line, "stroke-width": 1.6 }, svg);
+    S("line", { x1: X0, y1: Y1, x2: X0, y2: Y0 - 12, stroke: C.line, "stroke-width": 1.6 }, svg);
+    for (let i = 0; i <= IMAX; i++) {
+      S("line", { x1: TX(i), y1: Y1, x2: TX(i), y2: Y1 + 5, stroke: C.line, "stroke-width": 1 }, svg);
+      T(svg, TX(i), Y1 + 18, String(i), { "text-anchor": "middle", "font-size": 10.5, fill: "#444" });
+    }
+    for (let v = 0; v <= VMAX; v += 5) {
+      S("line", { x1: X0 - 4, y1: QY(v), x2: X0, y2: QY(v), stroke: C.line, "stroke-width": 1 }, svg);
+      T(svg, X0 - 8, QY(v) + 4, String(v), { "text-anchor": "end", "font-size": 10.5, fill: "#444" });
+    }
+    T(svg, X1, Y1 + 32, "I (A)", { "text-anchor": "end", "font-size": 12, fill: C.line });
+    T(svg, X0 - 8, Y0 - 18, "p.d. (V)", { "text-anchor": "start", "font-size": 12, fill: C.line });
+
+    /* ---- one straight line through the origin, slope R ---- */
+    const iEnd = Math.min(IMAX, VMAX / R);
+    S("line", { x1: TX(0), y1: QY(0), x2: TX(iEnd), y2: QY(R * iEnd),
+      stroke: C.blue, "stroke-width": 2.6 }, svg);
+
+    /* ---- the printed reading, which is where q6's 4 ohm comes from ----
+     * drawn as a box a little larger than the live dot, so at R = 4 ohm (when the two
+     * coincide) the amber frame still shows around the blue dot instead of vanishing */
+    const px = TX(Q6_I), py = QY(Q6_V);
+    S("rect", { x: px - 7, y: py - 7, width: 14, height: 14, fill: "none", stroke: C.amber, "stroke-width": 2 }, svg);
+
+    /* ---- the same current on this conductor, with guides to both axes ---- */
+    const ly = QY(V);
+    S("line", { x1: px, y1: QY(0), x2: px, y2: ly, stroke: C.grey, "stroke-width": 1, "stroke-dasharray": "3 3" }, svg);
+    S("line", { x1: X0, y1: ly, x2: px, y2: ly, stroke: C.grey, "stroke-width": 1, "stroke-dasharray": "3 3" }, svg);
+    S("circle", { cx: px, cy: ly, r: 5.5, fill: "#fff", stroke: C.blue, "stroke-width": 2.4 }, svg);
+
+    /* ---- the reading column: no text in the plot itself, so nothing can collide ---- */
+    const col = (y, s, color, size) =>
+      T(svg, CX, y, s, { "text-anchor": "middle", "font-size": size, "font-weight": 700, fill: color });
+    col(84, "R = " + R.toFixed(1) + " \u03A9", C.blue, 15);
+    col(112, "V = RI", C.grey, 12);
+    col(140, "at I = " + Q6_I.toFixed(1) + " A", C.grey, 11.5);
+    col(168, "V = " + V.toFixed(1) + " V", C.blue, 13.5);
+
+    /* ---- the reading row ---- */
+    const latex = "R = \\frac{V}{I} = \\frac{" + V.toFixed(1) + "\\ \\text{V}}{" + Q6_I.toFixed(1) +
+      "\\ \\text{A}} = " + R.toFixed(1) + "\\ \\Omega";
+    const same = Math.abs(R - Q6_R0) < 0.05;
+    const caption = same
+      ? "This is the printed conductor: at 3.0 A the p.d. is 12.0 V, so R = 4.0 \u03A9 — the line is straight through the origin, which is what constant resistance looks like."
+      : "One straight line through the origin means R does not change. At " + R.toFixed(1) +
+        " \u03A9 the same 3.0 A needs " + V.toFixed(1) + " V, so the line is " +
+        (R > Q6_R0 ? "steeper" : "flatter") + " than the printed 4.0 \u03A9 one.";
+    r.set(latex, true, caption, { yes: "live readings" });
+  };
+
+  rS.on(render);
+  render();
+}
+
 /* ---------------- Q16: the same two resistors, in series and in parallel ----------------
  *
  * q16 gives 3 ohm, 6 ohm and a 9 V battery, and its answers are
@@ -353,7 +453,7 @@ function q16(root) {
   render();
 }
 
-const REGISTRY = { q2, q3, q16 };
+const REGISTRY = { q2, q3, q6, q16 };
 
 export function hasGraphic(id) {
   return Boolean(REGISTRY[id]);
