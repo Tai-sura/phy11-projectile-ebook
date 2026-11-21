@@ -687,10 +687,10 @@
     {
       "page": 6,
       "region": [
-        44.0,
-        495.4,
-        576.3,
-        652.8
+        46.0,
+        514.0,
+        575.0,
+        626.0
       ],
       "scene": "phy06:RoughIncline",
       "src": "media/rough-incline.mp4",
@@ -700,10 +700,10 @@
     {
       "page": 6,
       "region": [
-        44.7,
-        698.7,
-        577.0,
-        791.6
+        352.0,
+        698.0,
+        566.0,
+        776.0
       ],
       "scene": "phy06:FrictionComp",
       "src": "media/friction-comp.mp4",

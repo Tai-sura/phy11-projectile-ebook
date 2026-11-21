@@ -5,7 +5,7 @@
  * bar models, MC checkers).
  */
 
-import { C, S, T, scene, clear, slider, readout, question, buttonRow, sector, tabs } from "../../engine/widgets/kit.js";
+import { C, H, S, T, scene, clear, slider, readout, question, buttonRow, sector, tabs } from "../../engine/widgets/kit.js";
 
 /* ---------------- Q9: two strings hold a weight — the angles fix the tensions ----------------
  *
@@ -327,8 +327,140 @@ function q35(root) {
   render();
 }
 
+/* ---------------- Q18: four forces at P, summed live ----------------
+ *
+ * The printed working reads each force off the 1 cm = 1 N grid and adds the components:
+ *     horizontal  -1 -2 +3 +4 = +4 N (to the right)
+ *     vertical    +3 -2 -3 +1 = -1 N (downwards)
+ * so |R| = sqrt(17) = 4.123 N at atan(1/4) = 14.04 deg below the +x axis. The widget draws
+ * the four printed arrows on a 1 N grid at P, lets the reader switch any of them off, and
+ * recomputes the resultant from the components on every change — nothing is hard coded.
+ */
+const Q18F = [
+  { name: "F₁", dx: -1, dy: 3, color: C.blue },
+  { name: "F₂", dx: -2, dy: -2, color: C.pink },
+  { name: "F₃", dx: 3, dy: -3, color: C.green },
+  { name: "F₄", dx: 4, dy: 1, color: C.amber },
+];
+const K18 = (v) => {
+  if (!Number.isFinite(v)) return "—";
+  const s = Math.abs(v) < 5e-3 ? "0.00" : v.toPrecision(3);
+  return s.includes("e") ? String(Number(s)) : s;
+};
+
+function q18(root) {
+  const CW = 620, CH = 350, PX = 300, PY = 176, U = 26; // U px per newton
+  const svg = scene(CW, CH);
+  const on = [true, true, true, true];
+  const r = readout();
+  let timer = 0, step = 0;
+  const stop = () => { if (timer) { clearInterval(timer); timer = 0; } };
+
+  const btns = H("div", { class: "g-btns" });
+  const chips = Q18F.map((f, i) => {
+    const b = H("button", { type: "button", onclick: () => { on[i] = !on[i]; stop(); render(); } }, [`${f.name} ✓`]);
+    btns.append(b);
+    return b;
+  });
+  const playBtn = H("button", { type: "button", onclick: () => {
+    stop();
+    step = 0;
+    on.fill(false);
+    render();
+    timer = setInterval(() => {
+      if (step >= 4) { stop(); return; }
+      on[step] = true;
+      step += 1;
+      render();
+    }, 750);
+  } }, ["▶ add one by one"]);
+
+  root.append(
+    question("Four forces act at P on a 1 cm = 1 N grid. Find the horizontal and vertical components of the resultant.", [
+      "Read each force off the grid: $F_1{=}(-1,3)$, $F_2{=}(-2,-2)$, $F_3{=}(3,-3)$, $F_4{=}(4,1)$",
+      "Components add: $\\Sigma F_x$, $\\Sigma F_y$",
+    ]),
+    svg,
+    H("div", {}, [btns, playBtn]),
+    r.el,
+  );
+
+  const put = (x, y, text, color, weight = 700, size = 12.5) => {
+    const half = (text.length * size * 0.56) / 2 + 4;
+    T(svg, Math.min(CW - half, Math.max(half, x)), Math.min(CH - 8, Math.max(size, y)), text,
+      { "text-anchor": "middle", "font-size": size, "font-weight": weight, fill: color });
+  };
+
+  const render = () => {
+    clear(svg);
+    chips.forEach((b, i) => {
+      b.textContent = `${Q18F[i].name} ${on[i] ? "✓" : "✗"}`;
+      b.style.opacity = on[i] ? "1" : "0.45";
+    });
+
+    // 1 N grid, axes a shade darker
+    for (let gx = -9; gx <= 11; gx++) {
+      const x = PX + gx * U;
+      if (x < 8 || x > CW - 8) continue;
+      S("line", { x1: x, y1: 12, x2: x, y2: CH - 16, stroke: gx === 0 ? C.line : "#e6e0d4", "stroke-width": gx === 0 ? 1.4 : 1 }, svg);
+    }
+    for (let gy = -6; gy <= 6; gy++) {
+      const y = PY + gy * U;
+      if (y < 12 || y > CH - 16) continue;
+      S("line", { x1: 8, y1: y, x2: CW - 8, y2: y, stroke: gy === 0 ? C.line : "#e6e0d4", "stroke-width": gy === 0 ? 1.4 : 1 }, svg);
+    }
+    T(svg, 14, PY - 8, "+y (up)", { "font-size": 11, fill: C.grey });
+    T(svg, CW - 14, PY + 18, "+x (right)", { "text-anchor": "end", "font-size": 11, fill: C.grey });
+
+    // the four forces, drawn from P
+    Q18F.forEach((f, i) => {
+      if (!on[i]) return;
+      const x2 = PX + f.dx * U, y2 = PY - f.dy * U;
+      S("line", { x1: PX, y1: PY, x2, y2, stroke: f.color, "stroke-width": 3, "stroke-linecap": "round",
+        "marker-end": `url(#arr-${svg.dataset.uid})` }, svg);
+      const len = Math.hypot(f.dx, f.dy) * U || 1;
+      put(x2 + (12 * (x2 - PX)) / len, y2 + (12 * (y2 - PY)) / len - 2, f.name, f.color, 700, 12);
+    });
+
+    // the resultant, from the same point
+    const sx = Q18F.reduce((a, f, i) => a + (on[i] ? f.dx : 0), 0);
+    const sy = Q18F.reduce((a, f, i) => a + (on[i] ? f.dy : 0), 0);
+    const mag = Math.hypot(sx, sy);
+    if (mag > 1e-9) {
+      const x2 = PX + sx * U, y2 = PY - sy * U;
+      S("line", { x1: PX, y1: PY, x2, y2, stroke: C.ink, "stroke-width": 4, "stroke-linecap": "round",
+        "marker-end": `url(#arrInk-${svg.dataset.uid})` }, svg);
+      put(x2 + 26, y2 - 6, `R = ${K18(mag)} N`, C.ink, 700, 12.5);
+    }
+    S("circle", { cx: PX, cy: PY, r: 4.5, fill: C.ink }, svg);
+    T(svg, PX - 6, PY + 16, "P", { "text-anchor": "end", "font-size": 12, "font-weight": 700, fill: C.ink });
+
+    // the algebra, exactly as the printed working writes it
+    const sign = (v, first) => (first ? (v < 0 ? `-${Math.abs(v)}` : `${v}`) : v < 0 ? `-${Math.abs(v)}` : `+${v}`);
+    const xTerms = Q18F.map((f, i) => (on[i] ? sign(f.dx, false) : "")).filter(Boolean).join("");
+    const yTerms = Q18F.map((f, i) => (on[i] ? sign(f.dy, false) : "")).filter(Boolean).join("");
+    const firstX = xTerms.startsWith("+") ? xTerms.slice(1) : xTerms;
+    const firstY = yTerms.startsWith("+") ? yTerms.slice(1) : yTerms;
+    const dirX = sx > 0 ? "to the right" : sx < 0 ? "to the left" : "";
+    const dirY = sy > 0 ? "upwards" : sy < 0 ? "downwards" : "";
+    const latex = sfx(`\\Sigma F_x = ${firstX || "0"} = ${sign(sx, true)}\\ \\text{N}`);
+    const ang = mag > 1e-9 ? Math.abs((Math.atan2(sy, sx) * 180) / Math.PI) : 0;
+    const cap = `Σ F_y = ${firstY || "0"} = ${sign(sy, true)} N ${dirY}  ·  R = ${K18(mag)} N at ${K18(ang)}° `
+      + (sy < 0 ? "below" : "above") + " the +x axis";
+    if (on.every(Boolean)) {
+      r.set(latex, true, `${cap}  ·  horizontal ${sign(sx, true)} N ${dirX}`, { yes: "matches the printed (D)" });
+    } else {
+      r.set(latex, null, cap);
+    }
+  };
+
+  function sfx(s) { return s; }
+  render();
+}
+
 const REGISTRY = {
   q9,
+  q18,
   q35,
 };
 
