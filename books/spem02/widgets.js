@@ -319,6 +319,106 @@ function q6(root) {
   render();
 }
 
+/* ---------------- Q9: resistance from the length of a wire, R = rho l / A ----------------
+ *
+ * q9 prints a metal wire 70 cm long, 1 mm across, R = 0.6 ohm, and gets
+ *     A = pi r^2 = pi (0.0005)^2 = 7.854e-7 m^2,   rho = RA/l = 6.73e-7 ohm m
+ * and part (b) halves the length: the resistance halves to 0.3 ohm, the resistivity does
+ * not change. The widget keeps exactly those printed numbers — the diameter stays 1 mm and
+ * rho stays the value part (a) found — and only the length is on the slider, which is the
+ * thing q9 (b) varies. The wire is drawn to a fixed 0..100 cm scale, so its length on
+ * screen is the length in the question.
+ */
+const Q9_RHO = 6.73e-7;    // ohm m, what q9 (a) finds
+const Q9_D = 1e-3;         // m, the printed diameter (radius 0.5 mm)
+const Q9_L0 = 70;          // cm, the printed length
+const Q9_A = Math.PI * (Q9_D / 2) ** 2;   // m^2, the printed cross-section
+
+function q9(root) {
+  const CW = 560, CH = 240;
+  const svg = scene(CW, CH);
+  const lS = slider({ label: "length l (cm)", min: 10, max: 100, step: 5, value: Q9_L0,
+    fmt: (v) => v.toFixed(0) + " cm", play: false });
+  const r = readout();
+
+  root.append(
+    question("A metal wire 70 cm long has a resistance of 0.6 \u03A9; its diameter is 1 mm. Find the resistivity, then the resistance and resistivity when the length is halved.", [
+      "Resistance of a wire: $R = \\rho\\dfrac{l}{A}$, so $\\rho = \\dfrac{RA}{l}$",
+      "Cross-section $A = \\pi r^2$ with $r = 0.5\\ \\text{mm}$",
+      "Halving the length halves $R$; $\\rho$ is a property of the metal, so it does not change",
+    ]),
+    svg,
+    lS.el, r.el,
+  );
+
+  // fixed drawing scale: 0..100 cm across 350 px, so the wire length on screen means something
+  const WX = 80, WMAX = 350, WY = 84, WH = 16, SY = 122;
+  const XW = (cm) => WX + (cm / 100) * WMAX;
+  const CX = 498;
+
+  // one text element with a superscript tail, so "10^-7" is a real exponent, not a caret
+  const sci = (x, y, head, sup, tail, attrs) => {
+    const t = S("text", Object.assign({ x, y }, attrs), svg);
+    S("tspan", {}, t).textContent = head;
+    if (sup) S("tspan", { "baseline-shift": "super", "font-size": (attrs["font-size"] || 11) * 0.72 }, t).textContent = sup;
+    if (tail) S("tspan", {}, t).textContent = tail;
+    return t;
+  };
+
+  const render = () => {
+    clear(svg);
+    const l = lS.get();                 // cm
+    const R = (Q9_RHO * (l / 100)) / Q9_A;
+
+    /* ---- the wire, drawn to the fixed scale ---- */
+    S("rect", { x: WX, y: WY, width: XW(l) - WX, height: WH, rx: 8,
+      fill: C.amberSoft, stroke: C.amber, "stroke-width": 2 }, svg);
+    // a couple of marks inside the wire, so a long wire does not read as a plain block
+    for (let cm = 20; cm < l; cm += 20) {
+      S("line", { x1: XW(cm), y1: WY + 2, x2: XW(cm), y2: WY + WH - 2, stroke: C.amber,
+        "stroke-width": 1, "stroke-dasharray": "2 3" }, svg);
+    }
+
+    /* ---- the length scale under it ---- */
+    S("line", { x1: WX, y1: SY, x2: WX + WMAX, y2: SY, stroke: C.line, "stroke-width": 1.4 }, svg);
+    for (let cm = 0; cm <= 100; cm += 10) {
+      const big = cm % 20 === 0;
+      S("line", { x1: XW(cm), y1: SY, x2: XW(cm), y2: SY + (big ? 6 : 3), stroke: C.line, "stroke-width": 1 }, svg);
+      if (big) T(svg, XW(cm), SY + 20, String(cm), { "text-anchor": "middle", "font-size": 10, fill: "#444" });
+    }
+    T(svg, WX + WMAX, SY + 36, "length (cm)", { "text-anchor": "end", "font-size": 10.5, fill: C.line });
+
+    /* ---- the 1 mm diameter, drawn as the cross-section it is ---- */
+    S("circle", { cx: 102, cy: 176, r: 9, fill: C.amberSoft, stroke: C.amber, "stroke-width": 2 }, svg);
+    S("line", { x1: 93, y1: 176, x2: 111, y2: 176, stroke: C.amber, "stroke-width": 1.4 }, svg);
+    T(svg, 120, 172, "diameter " + (Q9_D * 1000).toFixed(0) + " mm", { "font-size": 10.5, "font-weight": 700, fill: C.ink });
+    sci(120, 190, "A = \u03C0r\u00B2 = 7.85 \u00D7 10", "-7", " m\u00B2", { "font-size": 10.5, fill: C.grey });
+
+    /* ---- the reading column, clear of the wire and the scale ---- */
+    const col = (y, s, color, size) =>
+      T(svg, CX, y, s, { "text-anchor": "middle", "font-size": size, "font-weight": 700, fill: color });
+    col(84, "l = " + l.toFixed(0) + " cm", C.grey, 12);
+    sci(CX - 52, 114, "\u03C1 = 6.73 \u00D7 10", "-7", " \u03A9 m", { "font-size": 11, "font-weight": 700, fill: C.amber });
+    col(152, "R = " + R.toFixed(2) + " \u03A9", C.blue, 17);
+
+    /* ---- the reading row ---- */
+    const latex = "R = \\rho\\frac{l}{A} = " + R.toFixed(2) + "\\ \\Omega,\\quad l = " + l.toFixed(0) +
+      "\\ \\text{cm},\\quad \\rho = 6.73\\times10^{-7}\\ \\Omega\\,\\text{m}";
+    const half = Math.abs(l - Q9_L0 / 2) < 2.6;
+    const full = Math.abs(l - Q9_L0) < 2.6;
+    const caption = full
+      ? "The printed wire: 70 cm of 1 mm metal with \u03C1 = 6.73 \u00D7 10\u207B\u2077 \u03A9 m gives R = 0.60 \u03A9."
+      : half
+        ? "Halved to 35 cm: the resistance halves to 0.30 \u03A9, but \u03C1 stays 6.73 \u00D7 10\u207B\u2077 \u03A9 m — resistivity belongs to the metal, not to the piece."
+        : "A and \u03C1 are fixed, so R is proportional to the length: " + l.toFixed(0) + " cm of this wire is "
+          + R.toFixed(2) + " \u03A9, and half the length would be " + (R / 2).toFixed(2) + " \u03A9.";
+    r.set(latex, true, caption, { yes: "live readings" });
+  };
+
+  lS.on(render);
+  render();
+}
+
 /* ---------------- Q16: the same two resistors, in series and in parallel ----------------
  *
  * q16 gives 3 ohm, 6 ohm and a 9 V battery, and its answers are
@@ -453,7 +553,7 @@ function q16(root) {
   render();
 }
 
-const REGISTRY = { q2, q3, q6, q16 };
+const REGISTRY = { q2, q3, q6, q9, q16 };
 
 export function hasGraphic(id) {
   return Boolean(REGISTRY[id]);
