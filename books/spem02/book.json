@@ -970,13 +970,13 @@
       "page": 2,
       "region": [
         40,
-        60,
-        580,
+        71.5,
+        582,
         330
       ],
       "scene": "spem02:Highlights",
-      "src": "media/p2-highlights.mp4",
-      "poster": "media/p2-highlights.jpg",
+      "src": "media/p2-highlights-4.mp4",
+      "poster": "media/p2-highlights-4.jpg",
       "title": "The four key points on this page"
     },
     {
@@ -998,11 +998,11 @@
         24,
         104,
         578,
-        264.5
+        265.5
       ],
       "scene": "spem02:ResistorNetwork",
-      "src": "media/resistor-network-5.mp4",
-      "poster": "media/resistor-network-5.jpg",
+      "src": "media/resistor-network-7.mp4",
+      "poster": "media/resistor-network-7.jpg",
       "title": "Series, then parallel: same I, same V"
     },
     {
@@ -1035,13 +1035,13 @@
       "page": 17,
       "region": [
         12,
-        133.7,
+        136,
         291.3,
         315
       ],
       "scene": "spem02:Measurement",
-      "src": "media/measurement-panel-1.mp4",
-      "poster": "media/measurement-panel-1-poster.png",
+      "src": "media/measurement-panel-2.mp4",
+      "poster": "media/measurement-panel-2-poster.png",
       "title": "The ammeter also carries the voltmeter current"
     },
     {
