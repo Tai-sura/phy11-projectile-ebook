@@ -967,6 +967,19 @@
       "title": "4 J given, 1 J and 3 J spent: V = E/Q"
     },
     {
+      "page": 2,
+      "region": [
+        40,
+        60,
+        580,
+        330
+      ],
+      "scene": "spem02:Highlights",
+      "src": "media/p2-highlights.mp4",
+      "poster": "media/p2-highlights.jpg",
+      "title": "The four key points on this page"
+    },
+    {
       "page": 4,
       "region": [
         216.7,
@@ -1004,6 +1017,19 @@
       "src": "media/rheostat-panel-1.mp4",
       "poster": "media/rheostat-panel-1-poster.png",
       "title": "Slide the contact: more wire, more resistance"
+    },
+    {
+      "page": 16,
+      "region": [
+        14.7,
+        104,
+        576.7,
+        343.3
+      ],
+      "scene": "spem02:Potential",
+      "src": "media/potential-panel-2.mp4",
+      "poster": "media/potential-panel-2-poster.png",
+      "title": "One circuit, two reference points: 0 V at A"
     },
     {
       "page": 18,
