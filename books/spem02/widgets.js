@@ -3,7 +3,7 @@
  * Build them from the shared kit; house rules are in docs/03-authoring-style.md.
  */
 
-import { C, S, T, scene, clear, readout, question, tabs, slider } from "../../engine/widgets/kit.js";
+import { C, S, T, scene, clear, readout, question, tabs, slider, buttonRow } from "../../engine/widgets/kit.js";
 
 /* ---------------- Q2: charge = current x time, and the mA h rating ----------------
  *
@@ -419,6 +419,218 @@ function q9(root) {
   render();
 }
 
+/* ---------------- Q36: collapse a symmetric network, step by step ----------------
+ *
+ * q36 has no variable resistor: it is a fixed symmetric network, and the printed working is
+ * a sequence of equipotential merges, so this widget is a step-through, not a slider.
+ *
+ * (a) printed p13: P - 12 - 12 - 12 - Q on one line, with a top wire joining d1 to d3 and a
+ *     bottom wire joining d2 to d4 (the four junction dots in the figure). Therefore all
+ *     three 12 ohm resistors hang between the same two nodes, and
+ *         R_PQ = 12/3 = 4 ohm            <- the printed answer
+ * (b) printed p13: a square with 1 ohm on the top edge, 1 ohm on the left, 1 ohm on the
+ *     right, 2 ohm on the bottom, and two plain diagonals (with a hop, so they do NOT meet)
+ *     joining A to the top-right corner and the top-left corner to B. Merging the equal
+ *     potentials leaves four branches in parallel:
+ *         1 || 1 || 1 || 2  ->  R_AB = 1/(1+1+1+1/2) = 2/7 ohm ~ 0.29 ohm
+ *
+ * Only printed values are used: 12, 12, 12 for (a) and 1, 1, 1, 2 for (b).
+ */
+const Q36_CHAIN = [12, 12, 12];      // ohm, printed in figure (a)
+const Q36_BRIDGE = [1, 1, 1, 2];     // ohm, printed in figure (b)
+
+function q36(root) {
+  const CW = 560, CH = 310;
+  const svg = scene(CW, CH);
+  const r = readout();
+  const state = { tab: 0, step: 0 };
+
+  const stepBtn = buttonRow([
+    ["next step \u25B8", () => { state.step = Math.min(3, state.step + 1); render(); }],
+    ["reset \u21BA", () => { state.step = 0; render(); }],
+  ]);
+
+  root.append(
+    question("Find the equivalent resistance between P and Q. In (a) three 12 \u03A9 resistors sit on one line with two cross wires; in (b) a square of 1 \u03A9, 1 \u03A9, 1 \u03A9 and 2 \u03A9 has two plain diagonals.", [
+      "Points joined by a plain wire are at the same potential, so they are one node",
+      "Between the same two nodes the resistors are in parallel: $\\frac{1}{R} = \\sum \\frac{1}{R_i}$",
+      "Nothing changes value: the same printed resistors are regrouped",
+    ]),
+    svg,
+    tabs(["three 12 \u03A9", "the 1 \u03A9 square"], (i) => { state.tab = i; state.step = 0; render(); }),
+    stepBtn,
+    r.el,
+  );
+
+  const CX = 486;
+
+  const render = () => {
+    clear(svg);
+    const step = state.step;
+    const chain = state.tab === 0;
+    const parts = chain ? Q36_CHAIN : Q36_BRIDGE;
+    const req = 1 / parts.reduce((s, x) => s + 1 / x, 0);
+
+    const wire = (pts, color, w) => S("path", {
+      d: pts.map((p, i) => (i ? "L" : "M") + p[0] + " " + p[1]).join(" "),
+      fill: "none", stroke: color || C.line, "stroke-width": w || 2, "stroke-linejoin": "round",
+    }, svg);
+    const resH = (cx, cy, w, h, label) => {
+      S("rect", { x: cx - w / 2, y: cy - h / 2, width: w, height: h, fill: C.paper,
+        stroke: C.line, "stroke-width": 2 }, svg);
+      T(svg, cx, cy - h / 2 - 6, label, { "text-anchor": "middle", "font-size": 11.5, "font-weight": 700, fill: C.ink });
+    };
+    const resV = (cx, cy, w, h, label) => {
+      S("rect", { x: cx - w / 2, y: cy - h / 2, width: w, height: h, fill: C.paper,
+        stroke: C.line, "stroke-width": 2 }, svg);
+      T(svg, cx - w / 2 - 8, cy + 4, label, { "text-anchor": "end", "font-size": 11.5, "font-weight": 700, fill: C.ink });
+    };
+    const dot = (x, y, color) => S("circle", { cx: x, cy: y, r: 4, fill: color || C.line }, svg);
+    const term = (x, y, label, anchor) => {
+      S("circle", { cx: x, cy: y, r: 4.5, fill: C.paper, stroke: C.line, "stroke-width": 1.8 }, svg);
+      T(svg, x + (anchor === "end" ? -10 : 10), y + 5, label,
+        { "text-anchor": anchor || "start", "font-size": 13, "font-weight": 700, fill: C.ink });
+    };
+
+    /* ---------------- (a) ---------------- */
+    if (chain) {
+      if (step <= 1) {
+        const Y = 170, d = [84, 168, 252, 336];
+        wire([[50, Y], [d[0], Y]]);
+        d.forEach((x, i) => {
+          const col = step === 1 ? (i % 2 === 0 ? C.blue : C.green) : C.line;
+          dot(x, Y, col);
+        });
+        const boxes = [[84, 168], [168, 252], [252, 336]];
+        boxes.forEach(([a, b], i) => {
+          wire([[a, Y], [a + 10, Y]]);
+          resH((a + b) / 2, Y, 62, 16, parts[i] + " \u03A9");
+          wire([[b - 10, Y], [b, Y]]);
+        });
+        wire([[d[3], Y], [368, Y]]);
+        term(46, Y, "P", "end");
+        term(372, Y, "Q", "start");
+        // the two cross wires exactly as printed: d1-d3 over the top, d2-d4 underneath
+        const topCol = step === 1 ? C.blue : C.line;
+        const botCol = step === 1 ? C.green : C.line;
+        wire([[d[0], Y], [d[0], 122], [d[2], 122], [d[2], Y]], topCol);
+        wire([[d[1], Y], [d[1], 218], [d[3], 218], [d[3], Y]], botCol);
+        if (step === 1) {
+          T(svg, 210, 112, "d1 and d3 are wired together", { "text-anchor": "middle", "font-size": 10.5, "font-weight": 700, fill: C.blue });
+          T(svg, 210, 240, "d2 and d4 are wired together", { "text-anchor": "middle", "font-size": 10.5, "font-weight": 700, fill: C.green });
+          T(svg, 210, 262, "same potential at both ends", { "text-anchor": "middle", "font-size": 11, "font-weight": 700, fill: C.amber });
+        }
+      } else {
+        // the collapse: three branches between the same two nodes
+        const LX = 104, RX = 320, ys = [104, 170, 236];
+        wire([[LX, ys[0]], [LX, ys[2]]], C.line, 2.4);
+        wire([[RX, ys[0]], [RX, ys[2]]], C.line, 2.4);
+        ys.forEach((y, i) => {
+          wire([[LX, y], [LX + 14, y]]);
+          resH(212, y, 62, 16, parts[i] + " \u03A9");
+          wire([[RX - 14, y], [RX, y]]);
+        });
+        wire([[62, 170], [LX, 170]]);
+        wire([[RX, 170], [362, 170]]);
+        term(56, 170, "P", "end");
+        term(368, 170, "Q", "start");
+        T(svg, 212, 262, parts.join(" \u2225 "), { "text-anchor": "middle", "font-size": 12.5, "font-weight": 700, fill: C.blue });
+        if (step === 3) {
+          T(svg, 212, 288, "R = 12/3 = 4.00 \u03A9", { "text-anchor": "middle", "font-size": 14, "font-weight": 700, fill: C.blue });
+        }
+      }
+    } else {
+      /* ---------------- (b) ---------------- */
+      if (step <= 1) {
+        const TL = [128, 76], TR = [304, 76], A = [128, 232], B = [304, 232];
+        const colFor = (n) => (step === 1 ? n : C.line);
+        // the four edges
+        wire([[TL[0], TL[1]], [TL[0] + 40, TL[1]]], colFor(1));
+        wire([[TR[0] - 40, TR[1]], [TR[0], TR[1]]], colFor(1));
+        resH((TL[0] + TR[0]) / 2, TL[1], 62, 16, parts[0] + " \u03A9");
+        wire([[A[0], A[1]], [A[0] + 40, A[1]]], colFor(1));
+        wire([[B[0] - 40, B[1]], [B[0], B[1]]], colFor(1));
+        resH((A[0] + B[0]) / 2, A[1], 62, 16, parts[3] + " \u03A9");
+        wire([[TL[0], TL[1] + 40], [TL[0], A[1] - 40]], colFor(1));
+        resV(TL[0], (TL[1] + A[1]) / 2, 16, 62, parts[1] + " \u03A9");
+        wire([[TR[0], TR[1] + 40], [TR[0], B[1] - 40]], colFor(2));
+        resV(TR[0], (TR[1] + B[1]) / 2, 16, 62, parts[2] + " \u03A9");
+        // the two plain diagonals, with a hop so the crossing is not a junction
+        const cxm = (TL[0] + TR[0]) / 2, cym = (TL[1] + A[1]) / 2;
+        wire([[A[0], A[1]], [TR[0], TR[1]]], C.line, 1.8);
+        const dx = B[0] - TL[0], dy = B[1] - TL[1], dl = Math.hypot(dx, dy);
+        const ux2 = dx / dl, uy2 = dy / dl, hop = 11;
+        S("path", { d: "M " + TL[0] + " " + TL[1] +
+          " L " + (cxm - ux2 * hop) + " " + (cym - uy2 * hop) +
+          " A " + hop + " " + hop + " 0 0 0 " + (cxm + ux2 * hop) + " " + (cym + uy2 * hop) +
+          " L " + B[0] + " " + B[1],
+          fill: "none", stroke: C.line, "stroke-width": 1.8, "stroke-linejoin": "round" }, svg);
+        dot(TL[0], TL[1], step === 1 ? C.green : C.line);
+        dot(TR[0], TR[1], step === 1 ? C.blue : C.line);
+        dot(A[0], A[1], step === 1 ? C.blue : C.line);
+        dot(B[0], B[1], step === 1 ? C.green : C.line);
+        T(svg, A[0] - 10, A[1] + 12, "A", { "text-anchor": "end", "font-size": 13, "font-weight": 700, fill: C.ink });
+        T(svg, B[0] + 10, B[1] + 12, "B", { "text-anchor": "start", "font-size": 13, "font-weight": 700, fill: C.ink });
+        if (step === 1) {
+          T(svg, 216, 290, "A and the top-right corner are one node;", { "text-anchor": "middle", "font-size": 10.5, "font-weight": 700, fill: C.blue });
+          T(svg, 216, 306, "so are the top-left corner and B", { "text-anchor": "middle", "font-size": 10.5, "font-weight": 700, fill: C.green });
+        }
+      } else {
+        const LX = 116, RX = 316, ys = [70, 122, 174, 226];
+        wire([[LX, ys[0]], [LX, ys[3]]], C.line, 2.4);
+        wire([[RX, ys[0]], [RX, ys[3]]], C.line, 2.4);
+        ys.forEach((y, i) => {
+          wire([[LX, y], [LX + 14, y]]);
+          resH(216, y, 58, 15, parts[i] + " \u03A9");
+          wire([[RX - 14, y], [RX, y]]);
+        });
+        wire([[78, 148], [LX, 148]]);
+        wire([[RX, 148], [356, 148]]);
+        T(svg, 72, 153, "A", { "text-anchor": "end", "font-size": 13, "font-weight": 700, fill: C.ink });
+        T(svg, 362, 153, "B", { "text-anchor": "start", "font-size": 13, "font-weight": 700, fill: C.ink });
+        T(svg, 216, 262, parts.join(" \u2225 "), { "text-anchor": "middle", "font-size": 12.5, "font-weight": 700, fill: C.blue });
+        if (step === 3) {
+          T(svg, 216, 290, "R_AB = 1/(1+1+1+1/2) = 2/7 = " + req.toFixed(2) + " \u03A9",
+            { "text-anchor": "middle", "font-size": 13.5, "font-weight": 700, fill: C.blue });
+        }
+      }
+    }
+
+    /* ---- the fixed reading column ---- */
+    const col = (y, s, color, size) =>
+      T(svg, CX, y, s, { "text-anchor": "middle", "font-size": size, "font-weight": 700, fill: color });
+    col(74, chain ? "three 12 \u03A9" : "1 \u03A9, 1 \u03A9, 1 \u03A9, 2 \u03A9", C.ink, 12.5);
+    col(112, step >= 2 ? parts.join(" \u2225 ") : step === 1 ? "same potential" : "not merged yet",
+      step >= 2 ? C.blue : C.grey, 11.5);
+    col(160, step >= 3 ? (chain ? "R_PQ = 12/3" : "R_AB = 2/7") : (chain ? "R_PQ = ?" : "R_AB = ?"),
+      step >= 3 ? C.grey : C.grey, 12);
+    col(206, step >= 3 ? "= " + req.toFixed(2) + " \u03A9" : "\u2014", step >= 3 ? C.blue : C.grey, 17);
+
+    /* ---- the reading row ---- */
+    const par = parts.join(" \\parallel ");
+    const latex = step < 2
+      ? (chain ? "R_{PQ} = \\;" : "R_{AB} = \\;") + "?"
+      : step === 2
+        ? par
+        : (chain ? "R_{PQ} = \\frac{12}{3} = 4.00\\ \\Omega" : "R_{AB} = \\frac{2}{7} = " + req.toFixed(2) + "\\ \\Omega");
+    const captions = [
+      chain
+        ? "Three 12 \u03A9 resistors on one line between P and Q, with a top wire and a bottom wire. Press next step to collapse it."
+        : "A square of 1 \u03A9, 1 \u03A9, 1 \u03A9 and 2 \u03A9 with two plain diagonals crossing (they hop, so they are not joined). Press next step.",
+      "A plain wire puts its two ends at the same potential, so the marked junctions become one node each: every resistor now hangs between the same two nodes.",
+      chain
+        ? "So the three printed 12 \u03A9 resistors are in parallel, not in series."
+        : "So the four printed resistors are four parallel branches: 1 \u03A9, 1 \u03A9, 1 \u03A9 and 2 \u03A9.",
+      chain
+        ? "R_PQ = 12/3 = 4.00 \u03A9 — the printed answer; no value was changed, the network was only regrouped."
+        : "R_AB = 1/(1+1+1+1/2) = 2/7 = " + req.toFixed(2) + " \u03A9 — the printed answer.",
+    ];
+    r.set(latex, step >= 3 ? true : null, captions[Math.min(step, 3)], { yes: "printed answer" });
+  };
+
+  render();
+}
+
 /* ---------------- Q16: the same two resistors, in series and in parallel ----------------
  *
  * q16 gives 3 ohm, 6 ohm and a 9 V battery, and its answers are
@@ -553,7 +765,7 @@ function q16(root) {
   render();
 }
 
-const REGISTRY = { q2, q3, q6, q9, q16 };
+const REGISTRY = { q2, q3, q6, q9, q36, q16 };
 
 export function hasGraphic(id) {
   return Boolean(REGISTRY[id]);
