@@ -674,15 +674,15 @@
     {
       "page": 6,
       "region": [
-        44.0,
-        254.7,
-        576.3,
-        457.8
+        394.0,
+        258.0,
+        576.0,
+        456.5
       ],
       "scene": "phy06:SmoothIncline",
       "src": "media/smooth-incline.mp4",
       "poster": "media/smooth-incline.jpg",
-      "title": "The mass cancels: a = g sin θ"
+      "title": "a stays down the plane"
     },
     {
       "page": 6,
