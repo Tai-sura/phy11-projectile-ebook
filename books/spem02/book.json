@@ -967,6 +967,19 @@
       "title": "4 J given, 1 J and 3 J spent: V = E/Q"
     },
     {
+      "page": 4,
+      "region": [
+        216.7,
+        135,
+        590,
+        239
+      ],
+      "scene": "spem02:Resistivity",
+      "src": "media/resistivity-panel-2.mp4",
+      "poster": "media/resistivity-panel-2-poster.png",
+      "title": "Steeper line, smaller R: R = rho l / A"
+    },
+    {
       "page": 5,
       "region": [
         24,
