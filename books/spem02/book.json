@@ -933,6 +933,9 @@
       },
       "q13": {
         "space": 180
+      },
+      "q16": {
+        "space": 210
       }
     }
   },
@@ -972,8 +975,8 @@
         264.5
       ],
       "scene": "spem02:ResistorNetwork",
-      "src": "media/resistor-network-3.mp4",
-      "poster": "media/resistor-network-3.jpg",
+      "src": "media/resistor-network-4.mp4",
+      "poster": "media/resistor-network-4.jpg",
       "title": "Series, then parallel: same I, same V"
     },
     {

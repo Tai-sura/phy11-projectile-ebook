@@ -277,9 +277,15 @@ function q35(root) {
     if (mode === 2) {
       // the rope runs up the plane to a pulley just past the apex, then hangs clear
       // of the wedge to the 3 kg mass Y
-      const topX = cx + nx * hX, topY = cy + ny * hX;
+      // the rope leaves the middle of X's up-slope face: in the block's own frame that is
+      // (s/2, 0), so it is the centre offset by hX along the plane, NOT the bbox edge.
+      // It ends on the pulley's rim, on the line from the pulley centre to that point.
+      const attX = cx + dx * hX, attY = cy + dy * hX;
       const pulX = tipX + 16, pulY = Math.min(tipY, BY - 40) - 12;
-      S("line", { x1: topX, y1: topY, x2: pulX, y2: pulY, stroke: C.line, "stroke-width": 1.6 }, svg);
+      const rdx = attX - pulX, rdy = attY - pulY;
+      const rl = Math.hypot(rdx, rdy) || 1;
+      S("line", { x1: attX, y1: attY, x2: pulX + (rdx / rl) * 6, y2: pulY + (rdy / rl) * 6,
+        stroke: C.line, "stroke-width": 1.6 }, svg);
       S("circle", { cx: pulX, cy: pulY, r: 6, fill: "#fff", stroke: C.line, "stroke-width": 2 }, svg);
       S("line", { x1: pulX, y1: pulY + 6, x2: pulX, y2: BY - 34, stroke: C.line, "stroke-width": 1.6 }, svg);
       S("rect", { x: pulX - 15, y: BY - 34, width: 30, height: 24, fill: C.amberSoft, stroke: C.amber, "stroke-width": 2 }, svg);
