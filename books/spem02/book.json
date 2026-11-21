@@ -938,19 +938,6 @@
   },
   "media": [
     {
-      "page": 1,
-      "region": [
-        29.3,
-        106,
-        583,
-        262.7
-      ],
-      "scene": "spem02:Current",
-      "src": "media/current-panel-1.mp4",
-      "poster": "media/current-panel-1-poster.png",
-      "title": "Charge adds up: Q = It"
-    },
-    {
       "page": 5,
       "region": [
         24,
@@ -962,6 +949,19 @@
       "src": "media/resistor-network.mp4",
       "poster": "media/resistor-network.jpg",
       "title": "Series, parallel, then a mixed network"
+    },
+    {
+      "page": 18,
+      "region": [
+        56,
+        108,
+        578,
+        261
+      ],
+      "scene": "spem02:InternalResistance",
+      "src": "media/internal-resistance.mp4",
+      "poster": "media/internal-resistance.jpg",
+      "title": "Why the terminal voltage drops: V = e - Ir"
     }
   ]
 }
