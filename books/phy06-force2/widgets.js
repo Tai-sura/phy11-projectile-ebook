@@ -242,12 +242,18 @@ function q35(root) {
     }
     if (th > 2) {
       sector(svg, BX, BY, 34, -rad, 0, C.amberSoft, C.amber);
-      T(svg, BX + 48 * Math.cos(-rad / 2), BY + 48 * Math.sin(-rad / 2), `θ = ${th}°`,
-        { "text-anchor": "middle", "font-size": 11.5, "font-weight": 700, fill: C.amber });
+      // the label sits below the base line, so it never straddles the sloping surface
+      T(svg, BX + 58, BY + 18, `θ = ${th}°`,
+        { "text-anchor": "start", "font-size": 11.5, "font-weight": 700, fill: C.amber });
     }
-    // block X: a 17 px square with its lower face on the hypotenuse, turned with θ
-    const hX = 8.5;
-    const dx = Math.cos(rad), dy = -Math.sin(rad), nx = Math.sin(rad), ny = -Math.cos(rad);
+    // block X: a square turned with the plane, its lower face on the hypotenuse, and its
+    // size follows m_X (same material, so the side grows as the cube root of the mass).
+    // The normal has to be perpendicular to the slope direction (cos, -sin): that is
+    // (-sin, -cos), pointing up and left, away from the wedge. Taking (sin, -cos) instead
+    // shears the square into a rhombus (and collapses it at theta = 45).
+    const side = 18 * Math.cbrt(m / 5);
+    const hX = side / 2;
+    const dx = Math.cos(rad), dy = -Math.sin(rad), nx = -Math.sin(rad), ny = -Math.cos(rad);
     const px = BX + 0.55 * L * ux, py = BY + 0.55 * L * uy;
     const cx = px + nx * hX, cy = py + ny * hX;
     const corner = (a, b) => [cx + dx * a + nx * b, cy + dy * a + ny * b];
@@ -256,14 +262,17 @@ function q35(root) {
       points: pts.map((q) => q.map((v) => v.toFixed(1)).join(",")).join(" "),
       fill: C.blueSoft, stroke: C.blue, "stroke-width": 2,
     }, svg);
-    T(svg, cx, cy + 4, "X", { "text-anchor": "middle", "font-size": 11, "font-weight": 700, fill: C.blue });
+    const fs = Math.max(7, Math.min(12, side * 0.55));
+    T(svg, cx, cy + fs * 0.36, "X", { "text-anchor": "middle", "font-size": fs, "font-weight": 700, fill: C.blue });
 
     if (mode === 1) {
-      // F leaves the block's centre and points straight out of the plane
-      const len = 12 + Math.min(F, 90) * 0.5;
-      S("line", { x1: cx, y1: cy, x2: cx + len, y2: cy, stroke: C.red, "stroke-width": 2.6,
+      // F is horizontal and pushes X: the head stops at the block's downhill face and the
+      // letter sits at the tail, which is how the printed Fig aj draws it
+      const len = 16 + Math.min(F, 90) * 0.42;
+      const faceX = cx - dx * hX;
+      S("line", { x1: faceX - len, y1: cy, x2: faceX, y2: cy, stroke: C.red, "stroke-width": 2.6,
         "marker-end": `url(#arrRed-${svg.dataset.uid})` }, svg);
-      T(svg, cx + len + 6, cy + 4, "F", { "text-anchor": "start", "font-size": 12, "font-weight": 700, fill: C.red });
+      T(svg, faceX - len - 7, cy + 4, "F", { "text-anchor": "end", "font-size": 12, "font-weight": 700, fill: C.red });
     }
     if (mode === 2) {
       // the rope runs up the plane to a pulley just past the apex, then hangs clear

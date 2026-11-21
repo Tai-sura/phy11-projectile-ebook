@@ -948,7 +948,7 @@
       "scene": "spem02:ResistorNetwork",
       "src": "media/resistor-network.mp4",
       "poster": "media/resistor-network.jpg",
-      "title": "Series, parallel, then a mixed network"
+      "title": "Series, then parallel: same I, same V"
     },
     {
       "page": 18,
