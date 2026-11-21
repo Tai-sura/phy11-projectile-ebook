@@ -935,5 +935,33 @@
         "space": 180
       }
     }
-  }
+  },
+  "media": [
+    {
+      "page": 1,
+      "region": [
+        29.3,
+        106,
+        583,
+        262.7
+      ],
+      "scene": "spem02:Current",
+      "src": "media/current-panel-1.mp4",
+      "poster": "media/current-panel-1-poster.png",
+      "title": "Charge adds up: Q = It"
+    },
+    {
+      "page": 5,
+      "region": [
+        24,
+        104,
+        578,
+        266
+      ],
+      "scene": "spem02:ResistorNetwork",
+      "src": "media/resistor-network.mp4",
+      "poster": "media/resistor-network.jpg",
+      "title": "Series, parallel, then a mixed network"
+    }
+  ]
 }
